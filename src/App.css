@@ -1,38 +1,79 @@
-.App {
-  text-align: center;
+/* apply a natural box layout model to all elements, but allowing components to change */
+html,body, #root, #root>div{
+  height: 100vh;
+}
+html {
+  box-sizing: border-box;
+}
+body {
+  line-height: 2; /* a nice line-height */
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+.drag-drop-container {
+  height: 100%;
+  width: 100%;
+  border: 1px solid black;
+  overflow-y: auto;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.item {
+  margin: 20px;
+  padding: 10px;
+  border: 1px solid blue;
+  cursor: pointer;
+}
+.row-car{
+    display: flex;
+    justify-content:start;
+    height: 100%;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.col-1{
+  border: solid 1px;
   display: flex;
+  margin-left: 60px;
+  justify-content: space-between;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
 }
 
-.App-link {
-  color: #61dafb;
+.col-2{
+  border: solid 1px;
+  display: flex;
+  margin-left: 60px;
+  justify-content: space-between;
+  flex-direction: column;
+}
+.col-1-rueda-delantera-derecha{
+  background-color: red;
+  width:100px;
+  height: 100px;
+}
+.col-1-rueda-trasera-derecha{
+  background-color: red;
+  width:100px;
+  height: 100px;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.mechanics{
+  width: 100%;
+  height: 200px;
+  margin-top:20px;
+}
+.mechanics ul.mechanic{
+  display: flex;
+  list-style: none;
+  justify-content: space-between;
+  padding-left: 0px;
+}
+
+ul.mechanic li{
+  text-align: center;
+  border: solid 1px #FFF;
+}
+
+ul.mechanic li img{
+  max-width: 100%;
 }
