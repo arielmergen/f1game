@@ -1,10 +1,11 @@
 import React from 'react';
 
-function Mechanic(props) {
+const Mechanic= props => {
+    console.log(props);
     return (
         <li>
-            
+            {"esto es una lista"}
         </li>
     );
 }
-liport default Mechanli
+export default Mechanic;

@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect }  from 'react';
-import Mechanic from './Mechanics';
+import Mechanics from './Mechanics';
+import Mechanic from './Mechanic';
 import jackman from "./../img/male2.png";
 import gasman from "./../img/male1.png";
 import mechanic1 from "./../img/male5.png";
@@ -41,9 +42,9 @@ const items = {
 
 const MechanicsList = props =>{
 const{getState,setState, items}=props;
-console.log(items);
-  const startDrag = ev => {
 
+  const startDrag = ev => {
+    console.log(ev.currentTarget.getAttribute('dataitem'));
     //   const dataitem = {
     //     id:ev.currentTarget.getAttribute('dataid'),
     //     name:ev.currentTarget.getAttribute('dataname'),
@@ -65,8 +66,12 @@ console.log(items);
     isDragging:false
   });
     return(
-        <Mechanic>
-            {console.log(items)}
+      <>
+      {items.map(item => (
+        <Mechanic dataitem={items}/>
+      ))}
+      
+      <Mechanics>
             {items.map(item => (
                 <li
                 key={item.name} 
@@ -91,7 +96,9 @@ console.log(items);
                 </li>
             ))
             }
-        </Mechanic>
+        </Mechanics>
+      </>
+        
     );
 }
 
