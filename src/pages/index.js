@@ -5,25 +5,24 @@ import Score from './../screens/score';
 import './../css/styles.css';
 const RenderIfNeeded = props => {
     let page;
-    switch(props.getCurrentPage.page){
-        case 'Intro':
-            page = <Intro {...{props}}/>
-        break;
-        case 'Boxes':
-            page = <Boxes {...{props}}/>
-        break;
-        case 'Score':
-            page = <Score {...{props}}/>
-        break;
-        default:  page = <Intro {...{props}}/>;
-        
+    if(props.getCurrentPage.page==='Intro'){
+        page = <Intro {...{props}}/>
     }
+    if(props.getCurrentPage.page==='Boxes'){
+        page = <Boxes {...{props}}/>
+    }
+
+    if(props.getCurrentPage.page==='Score'){
+        page = <Score {...{props}}/>
+    }
+    
     return page;
 };
 
 const Index = props => {
     const intialCurrentPage ={
-        page:'Intro'
+        page:'Intro',
+        isLoading:false,
     }
     const initialUserState = {
         name:''

@@ -1,10 +1,23 @@
-import React from 'react';
+import React,{useRef} from 'react';
 
+
+const draggingStyle = {
+    opacity: 0.25,
+};
 const Mechanic= props => {
-    console.log(props);
+    const{getState,setState,dataitem,dropeffect}=props;
+    const image = useRef(null);
+    const startDrag = ev => {
+        setState({...getState,isDragging:true});
+        let parseDataItem = JSON.stringify(dataitem);
+        ev.dataTransfer.setData("drag-item", parseDataItem);
+        ev.dataTransfer.effectAllowed = dropeffect;
+    }
+    
+    const dragEnd = (props) => setState({...getState,isDragging:false});
     return (
-        <li>
-            {"esto es una lista"}
+        <li draggable onDragStart={startDrag} onDragEnd={dragEnd}>
+            {props.children}
         </li>
     );
 }
