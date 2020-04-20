@@ -1,13 +1,11 @@
-import React from 'react';
-import Layout from './../layout/Layout';
+import React from "react";
 
-
-const Score = props =>{
-    return(
-        <Layout>
+const Score = (props) => {
+    return (
+        <div className={`container`}>
             <p>Screen Score</p>
-        </Layout>
+        </div>
     );
-}
+};
 
 export default Score;

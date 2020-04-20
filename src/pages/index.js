@@ -1,54 +1,69 @@
-import React,{useState} from 'react';
-import Intro from './../screens/intro';
-import Boxes from './../screens/boxes';
-import Score from './../screens/score';
-import './../css/styles.css';
-const RenderIfNeeded = props => {
-    let page;
-    if(props.getCurrentPage.page==='Intro'){
-        page = <Intro {...{props}}/>
-    }
-    if(props.getCurrentPage.page==='Boxes'){
-        page = <Boxes {...{props}}/>
+import React, { useState, useEffect } from "react";
+
+import apiClient from "../apiClient";
+
+import Header from "./../components/Header";
+import Intro from "./../screens/intro";
+import Boxes from "./../screens/boxes";
+import Score from "./../screens/score";
+import Rules from "./../components/Rules";
+import "./../css/styles.css";
+
+const Index = (props) => {
+    const [getGameState, setGameState] = useState({ name: null, team: null, error: null });
+    const [getCurrentpage, setCurrentPage] = useState({
+        page: "Intro",
+    });
+
+    const goToIntroPage = () => setCurrentPage({ page: "Intro" });
+    const goToBoxesPage = () => setCurrentPage({ page: "Boxes" });
+    const goToScorePage = () => setCurrentPage({ page: "Score" });
+    const goToErrorPage = () => setCurrentPage({ page: "Error" });
+
+    useEffect(() => {
+        const { name, team, error } = getGameState;
+        if (!name || team || error) return;
+        apiClient
+            .createTeam('')
+            .then((team) => setGameState({ ...getGameState, team }))
+            .catch((err) => {
+                console.log('err', err)
+                setGameState({ ...getGameState, error: err });
+                goToErrorPage();
+            });
+    }, [getGameState]);
+
+    const returnToIndex = () => {
+        setGameState({ ...getGameState, error: null, name:''});
+        goToIntroPage()
     }
 
-    if(props.getCurrentPage.page==='Score'){
-        page = <Score {...{props}}/>
-    }
-    
-    return page;
+    return (
+        <>
+            <Header />
+            <br />
+            {getCurrentpage.page === "Intro" && (
+                <Intro setGameState={setGameState} getCurrentpage={getCurrentpage} goToBoxesPage={goToBoxesPage} />
+            )}
+            {getCurrentpage.page === "Boxes" && <Boxes getGameState={getGameState} goToScorePage={goToScorePage} />}
+            {getCurrentpage.page === "Score" && <Score getGameState={getGameState} setGameState={setGameState} />}
+            {getCurrentpage.page === "Error" && getGameState.error && <ErrorMessage error={getGameState.error} returnToIndex={returnToIndex} />}
+        </>
+    );
 };
 
-const Index = props => {
-    const intialCurrentPage ={
-        page:'Intro',
-        isLoading:false,
-    }
-    const initialUserState = {
-        name:''
-    };
-    const initialState={
-        item:{
-            display:false,
-            image:"",
-            isDragging:false
-        }
-    };
-    const[getState,setState] = useState(initialState);
-    const[getUserState,setUserState] = useState(initialUserState);  
-    const[getCurrentPage,setCurrentPage] = useState(intialCurrentPage);  
-    return(
-        <>
-            {<RenderIfNeeded 
-                getState={ getState }
-                setState={ setState }
-                getUserState={ getUserState }
-                setUserState={ setUserState }
-                getCurrentPage={ getCurrentPage }
-                setCurrentPage={ setCurrentPage }
-            />}
-        </>
-    )
-}
+const ErrorMessage = ({ error, returnToIndex }) => (
+    <>
+        <h1>Error: {error.message}</h1>
+        <button
+            onClick={(e) => {
+                e.preventDefault();
+                returnToIndex()
+            }}
+        >
+            Return
+        </button>
+    </>
+);
 
 export default Index;

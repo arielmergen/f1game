@@ -19,12 +19,12 @@
 .grid-middle {
     display: grid;
     grid-template-columns: repeat(14, 1fr);
-    grid-template-rows:repeat(14, 0.2fr);
+    grid-template-rows: repeat(14, 0.2fr);
     grid-column-gap: 0px;
     grid-row-gap: 0px;
 }
 
-.gird-bottom{
+.gird-bottom {
     display: grid;
     grid-template-columns: repeat(14, 3fr);
     grid-template-rows: repeat(7, 1fr);
@@ -32,48 +32,47 @@
     grid-row-gap: 0px;
 }
 
-.car{
+.car {
     background-image: url("../img/car.png");
     background-size: contain;
     background-repeat: no-repeat;
     height: 400px;
 }
 .rueda-trasera-derecha {
-    color:#FFF;
+    color: #fff;
     border: dotted 3px rgb(0, 247, 255);
     grid-area: 1 / 2 / 5 / 5;
     height: 100px;
 }
 .rueda-delantera-derecha {
-    color:#FFF;
+    color: #fff;
     border: dotted 3px rgb(0, 247, 255);
     grid-area: 1 / 9 / 5 / 12;
     height: 100px;
 }
 
 .rueda-trasera-izquierda {
-    color:#FFF;
+    color: #fff;
     border: dotted 3px rgb(0, 247, 255);
     grid-area: 2 / 2 / 6 / 5;
     margin-top: 24px;
     height: 100px;
 }
 .rueda-delantera-izquierda {
-    color:#FFF;
+    color: #fff;
     border: dotted 3px rgb(0, 247, 255);
     grid-area: 1 / 9 / 5 / 12;
     margin-top: 25px;
 }
 
-
 .gas {
-    color:#FFF;
+    color: #fff;
     border: dotted 3px rgb(0, 247, 255);
     grid-area: 7 / 1 / 8 / 3;
     height: 50px;
 }
 .trompa {
-    color:#FFF;
+    color: #fff;
     border: dotted 3px rgb(0, 247, 255);
     grid-area: -8 / 12 / -9 / 14;
     height: 50px;
