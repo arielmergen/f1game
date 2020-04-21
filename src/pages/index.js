@@ -24,10 +24,9 @@ const Index = (props) => {
         const { name, team, error } = getGameState;
         if (!name || team || error) return;
         apiClient
-            .createTeam('')
-            .then((team) => setGameState({ ...getGameState, team }))
+            .createTeam(name)
+            .then((team) => setGameState({ ...getGameState,team }))
             .catch((err) => {
-                console.log('err', err)
                 setGameState({ ...getGameState, error: err });
                 goToErrorPage();
             });

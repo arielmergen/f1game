@@ -1,16 +1,47 @@
-.parent {
-    display: grid;
-    /* grid-template-columns: repeat(8, 1fr); */
-    grid-template-columns: 1.1fr 2fr 2fr 2.1fr 1.9fr 1fr 2fr;
-    grid-template-rows: 1.1fr 2fr 2fr 2.1fr 1.9fr 1fr 2fr;
-    grid-template-rows: repeat(8, 3fr);
-    grid-column-gap: 0px;
-    grid-row-gap: 0px;
+.grid {
+	display: grid;
+	/* grid-template-columns: repeat(8, 1fr); */
+	grid-template-columns: 2fr 2fr 2fr 2fr 2fr 2fr 2fr 2fr 2fr 2fr 2fr;
+	grid-template-rows: 1.1fr 2fr 2fr 2.1fr 1.9fr 1fr 2fr;
+	grid-template-rows: repeat(5, 1fr);
+	grid-column-gap: 0px;
+	grid-row-gap: 0px;
+}
+
+.rear-right{
+    grid-area: 1 / 2 /1 / 4;
+    border: 4px dotted rgb(0, 225, 255);
+}
+
+.front-right{
+    grid-area: 1 / 8 /1 / 10;
+    border: 4px dotted rgb(0, 225, 255);
+}
+
+.rear-left{
+    grid-area: 5 / 2 / 5 / 4;
+    border: 4px dotted rgb(0, 225, 255);
+}
+
+.front-left{
+    grid-area: 5 / -5 / 5 / -3;
+    border: 4px dotted rgb(0, 225, 255);
+}
+
+.fuel{
+    grid-area: 3 / 1 / 4 / 3;
+    border: 4px dotted rgb(0, 225, 255);
+}
+
+
+.front{
+    grid-area: 3 / -3 / 4 / -1;
+    border: 4px dotted rgb(0, 225, 255);
 }
 
 .grid-top {
     display: grid;
-    grid-template-columns: repeat(14, 3fr);
+    grid-template-columns: repeat(12, 3fr);
     grid-template-rows: repeat(2, 1fr);
     grid-column-gap: 0px;
     grid-row-gap: 0px;
@@ -18,15 +49,15 @@
 
 .grid-middle {
     display: grid;
-    grid-template-columns: repeat(14, 1fr);
-    grid-template-rows: repeat(14, 0.2fr);
+    grid-template-rows: repeat(2, 1fr);
     grid-column-gap: 0px;
     grid-row-gap: 0px;
+    grid-template-columns: repeat(2, 2fr);
 }
 
 .gird-bottom {
     display: grid;
-    grid-template-columns: repeat(14, 3fr);
+    grid-template-columns: repeat(12, 3fr);
     grid-template-rows: repeat(7, 1fr);
     grid-column-gap: 0px;
     grid-row-gap: 0px;
@@ -36,19 +67,22 @@
     background-image: url("../img/car.png");
     background-size: contain;
     background-repeat: no-repeat;
+    min-height: 400px;
     height: 400px;
+    min-width: 672px;
+    width: 672px;
 }
 .rueda-trasera-derecha {
     color: #fff;
     border: dotted 3px rgb(0, 247, 255);
     grid-area: 1 / 2 / 5 / 5;
-    height: 100px;
+    height: 55px;
 }
 .rueda-delantera-derecha {
     color: #fff;
     border: dotted 3px rgb(0, 247, 255);
     grid-area: 1 / 9 / 5 / 12;
-    height: 100px;
+    height: 55px;
 }
 
 .rueda-trasera-izquierda {
@@ -56,7 +90,7 @@
     border: dotted 3px rgb(0, 247, 255);
     grid-area: 2 / 2 / 6 / 5;
     margin-top: 24px;
-    height: 100px;
+    height: 55px;
 }
 .rueda-delantera-izquierda {
     color: #fff;
@@ -68,12 +102,81 @@
 .gas {
     color: #fff;
     border: dotted 3px rgb(0, 247, 255);
-    grid-area: 7 / 1 / 8 / 3;
     height: 50px;
+    width: 70px;
+    margin-top: 26px;
 }
 .trompa {
     color: #fff;
     border: dotted 3px rgb(0, 247, 255);
-    grid-area: -8 / 12 / -9 / 14;
     height: 50px;
+    margin-top: 29px;
+    width: 70px;
+    margin-left: 106px;
+}
+
+@media (min-width: 768) {
+    .grid-top {
+        display: grid;
+        grid-template-columns: repeat(14, 3fr);
+        grid-template-rows: repeat(2, 1fr);
+        grid-column-gap: 0px;
+        grid-row-gap: 0px;
+    }
+    
+    .grid-middle {
+        display: grid;
+        grid-template-columns: repeat(14, 1fr);
+        grid-template-rows: repeat(14, 0.2fr);
+        grid-column-gap: 0px;
+        grid-row-gap: 0px;
+    }
+    
+    .gird-bottom {
+        display: grid;
+        grid-template-columns: repeat(14, 3fr);
+        grid-template-rows: repeat(7, 1fr);
+        grid-column-gap: 0px;
+        grid-row-gap: 0px;
+    }
+
+    .rueda-trasera-derecha {
+        color: #fff;
+        border: dotted 3px rgb(0, 247, 255);
+        grid-area: 1 / 2 / 5 / 5;
+        height: 100px;
+    }
+    .rueda-delantera-derecha {
+        color: #fff;
+        border: dotted 3px rgb(0, 247, 255);
+        grid-area: 1 / 9 / 5 / 12;
+        height: 100px;
+    }
+    
+    .rueda-trasera-izquierda {
+        color: #fff;
+        border: dotted 3px rgb(0, 247, 255);
+        grid-area: 2 / 2 / 6 / 5;
+        margin-top: 24px;
+        height: 100px;
+    }
+    .rueda-delantera-izquierda {
+        color: #fff;
+        border: dotted 3px rgb(0, 247, 255);
+        grid-area: 1 / 9 / 5 / 12;
+        margin-top: 25px;
+    }
+    
+    .gas {
+        color: #fff;
+        border: dotted 3px rgb(0, 247, 255);
+        grid-area: 2/1/2/2;
+        height: 50px;
+    }
+    .trompa {
+        color: #fff;
+        border: dotted 3px rgb(0, 247, 255);
+        grid-area: -8 / 12 / -9 / 14;
+        height: 50px;
+    }
 }

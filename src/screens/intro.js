@@ -11,7 +11,7 @@ const Intro = ({ getGameState, setGameState, goToBoxesPage }) => {
         if (!getUserState) return
         setGameState({ ...getGameState, name: getUserState });
         goToBoxesPage();
-    }, [getUserState, setUserState]);
+    }, [getUserState,setUserState,getGameState,setGameState,goToBoxesPage]);
 
     const goToRulesScreen = () => setUserScreen({ screen: "Rules" });
     const goToUserFormScreen = () => setUserScreen({ screen: "UserForm" });

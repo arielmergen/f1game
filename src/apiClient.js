@@ -17,6 +17,16 @@ const createTeam = (name) =>
     .then(handleErrors)
     .then((data) => data.json());
 
+    const createCar = (name) =>
+    fetch(API_URI + "cars", {
+        crossDomain: true,
+        method: "POST",
+        headers: { "Content-Type": "application/json" }
+    })
+    .then(handleErrors)
+    .then((data) => data.json());
+
+
 // const getCar = (name) =>
 //     fetch(API_URI + "cars", {
 //         crossDomain: true,
@@ -31,4 +41,4 @@ const createTeam = (name) =>
 //         headers: { "Content-Type": "application/json" },
 //     }).then((data) => data.json());
 
-export default { createTeam };
+export default { createTeam, createCar };

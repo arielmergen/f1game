@@ -11,42 +11,34 @@ const draggingStyle = {
     opacity: 0.25,
 };
 
+const handleHover = props =>{
+    console.log(props);
+}
+
 const MechanicsList = (props) => {
     const { items = [] } = props;
-    const [getState, setState] = useState({
-        isDragging: false,
-    });
+    const [isDragging, setisDragging] = useState(null);
     if (items) {
         return (
             <div className="mechanics">
-                <ul className="mechanic">
+                <ul className={`mechanic ${isDragging ? 'draggingStyle':''}`}>
                     {items.map((item) => (
                         <Mechanic
                             key={item.id}
                             dataitem={item}
                             dropeffect="link"
-                            getState={getState}
-                            setState={setState}
+                            setisDragging={setisDragging}
                         >
-                            <p>{item.name}</p>
-                            <p>{item.role}</p>
-                            <img
-                                src={
-                                    (item.image = item.name === "Julia" || item.name === "Denise" ? mechanic3 : jackman)
-                                }
-                                width="139"
-                                height="139"
-                            />
-                            <div className="btn-group-vertical d-none" role="group" aria-label="Vertical button group">
-                                <button type="button" className="btn btn-dark">
-                                    Remove wheel
-                                </button>
-                                <button type="button" className="btn btn-dark">
-                                    Lifting the car
-                                </button>
-                                <button type="button" className="btn btn-dark">
-                                    IS all Ok
-                                </button>
+                            <div className="card car-mechanic border-danger" onMouseOver={handleHover}>
+                                <h5 className="card-header text-center text-white bg-danger">
+                                    {item.name}
+                                </h5>
+                                <img className="card-img-top img-fluid mt-2" src={
+                                        (item.image = item.name === "Julia" || item.name === "Denise" ? mechanic3 : jackman)
+                                    } alt={item.name} />
+                                <div className="card-body">
+                                    <h5 className="card-title text-center">{item.role}</h5>
+                                </div>
                             </div>
                         </Mechanic>
                     ))}

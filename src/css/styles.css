@@ -10053,6 +10053,12 @@ h3 {
   padding: 0.8rem;
 }
 
+
+
+/*UTILS*/
+.draggingStyle{
+  opacity: 0.25
+}
 @media (min-width: 992px) {
   #mainNav {
     padding-top: 1.5rem;
@@ -10210,4 +10216,10 @@ form .row:first-child .floating-label-form-group {
 
 .copyright {
   background-color: #1a252f;
+}
+/*Card*/
+.car-mechanic:hover{
+  -webkit-box-shadow: 4px 33px 72px -15px rgba(0,0,0,1);
+  -moz-box-shadow: 4px 33px 72px -15px rgba(0,0,0,1);
+  box-shadow: 4px 33px 72px -15px rgba(0,0,0,1);
 }
