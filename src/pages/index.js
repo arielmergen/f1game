@@ -52,17 +52,22 @@ const Index = (props) => {
 };
 
 const ErrorMessage = ({ error, returnToIndex }) => (
-    <>
-        <h1>Error: {error.message}</h1>
-        <button
+    <div className="container">
+        <div className="row">
+            <div className="col-lg-12 text-center">
+                <h1 className="text-danger">Error: Britney Spears Would  Says - Oops!...I Did It Again - {error.message}</h1>
+            <button
+            className="btn btn-danger"
             onClick={(e) => {
                 e.preventDefault();
                 returnToIndex()
             }}
-        >
-            Return
-        </button>
-    </>
+            >
+                Return
+            </button>
+            </div>
+        </div>
+    </div>
 );
 
 export default Index;
