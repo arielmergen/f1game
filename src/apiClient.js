@@ -26,6 +26,15 @@ const createTeam = (name) =>
     .then(handleErrors)
     .then((data) => data.json());
 
+const liftCar = (carId, mechanicId) => 
+fetch(API_URI + `cars/${carId}/lift`,{
+    crossDomain: true,
+    method: "POST",
+    headers: { "Content-Type": "application/json", "x-member-id": mechanicId },
+    body: JSON.stringify({carId}),
+})
+.then(handleErrors)
+.then((data) => data.json());
 
 // const getCar = (name) =>
 //     fetch(API_URI + "cars", {
@@ -41,4 +50,4 @@ const createTeam = (name) =>
 //         headers: { "Content-Type": "application/json" },
 //     }).then((data) => data.json());
 
-export default { createTeam, createCar };
+export default { createTeam, createCar, liftCar };

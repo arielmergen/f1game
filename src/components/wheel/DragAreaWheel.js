@@ -1,12 +1,31 @@
 import React from 'react';
 
-const DragArea = props => {
+const statusWheel = (statusWhweel) =>{
+    let statusClassNameWheel;
+    switch(statusWhweel){
+        case 'NEEDS_CHANGE' :
+            statusClassNameWheel='need-change';
+        break;
+        case 'LOOSE' :
+            statusClassNameWheel='loose';
+        break;
+        case 'READY' :
+            statusClassNameWheel='ready';
+        break;
+        default:
+            statusClassNameWheel='';
+            break;
+    }
+    return statusClassNameWheel;
+}
+
+const DragAreaWheel = props => {
     const{setMechanicDropped, 
         getState, 
         setState, 
         setIsOver,
         position,
-        status, 
+        statusWhweel, 
         className}=props;
     const dragOver = (ev) => {
         ev.preventDefault();
@@ -24,16 +43,19 @@ const DragArea = props => {
     };
 
     const dragLeave = () => setIsOver(false);
+
+    
+
 return( 
     <div 
         onDragOver={dragOver} 
         onDrop={drop} 
         onDragEnter={dragEnter} 
         onDragLeave={dragLeave} 
-        className={className}>
+        className={`${className} ${statusWheel(statusWhweel)}`}>
             {props.children}
     </div>
 )
 }
 
-export default DragArea;
+export default DragAreaWheel;

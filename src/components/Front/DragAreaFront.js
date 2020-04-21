@@ -1,6 +1,7 @@
 import React from 'react';
 
-const DragArea = props => {
+const DragAreaFront = props => {
+
     const{setMechanicDropped, 
         getState, 
         setState, 
@@ -8,16 +9,19 @@ const DragArea = props => {
         position,
         status, 
         className}=props;
+
     const dragOver = (ev) => {
         ev.preventDefault();
         ev.dataTransfer.dropEffect = props.dropEffect;
     };
+
     const drop = (ev) => {
         let itemDropped = JSON.parse(ev.dataTransfer.getData("drag-item"));
         setState({ ...getState, display: true, itemDropped, setIsOver: false });
         setIsOver(false);
         setMechanicDropped(itemDropped);
     };
+
     const dragEnter = (ev) => {
         ev.dataTransfer.dropEffect = "link";
         setState({ ...getState, setIsOver: false });
@@ -36,4 +40,4 @@ return(
 )
 }
 
-export default DragArea;
+export default DragAreaFront;
