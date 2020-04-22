@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 const UserForm = (props) => {
-    const { setUserState, goToRulesScreen } = props;
+    const { setUserState, goToRulesScreen, startGame } = props;
 
     const [getName, setName] = useState({});
     const [error, setError] = useState(false);
@@ -15,7 +15,7 @@ const UserForm = (props) => {
             return;
         }
         setError(false);
-        setUserState(name);
+        startGame(getName.name);
     };
     const onchange = (ev) => {
         ev.preventDefault();

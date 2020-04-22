@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 
 import apiClient from "../apiClient";
 
@@ -9,44 +9,44 @@ import Score from "./../screens/score";
 import Rules from "./../components/Rules";
 import "./../css/styles.css";
 
+const inital_game_state = { name: null, team: null, error: null };
+
 const Index = (props) => {
-    const [getGameState, setGameState] = useState({ name: null, team: null, error: null });
+    const [getGameState, setGameState] = useState(inital_game_state);
     const [getCurrentpage, setCurrentPage] = useState({
         page: "Intro",
     });
 
-    const goToIntroPage = () => setCurrentPage({ page: "Intro" });
-    const goToBoxesPage = () => setCurrentPage({ page: "Boxes" });
-    const goToScorePage = () => setCurrentPage({ page: "Score" });
-    const goToErrorPage = () => setCurrentPage({ page: "Error" });
-
-    useEffect(() => {
-        const { name, team, error } = getGameState;
-        if (!name || team || error) return;
+    const goToIntroPage = useCallback(() => setCurrentPage({ page: "Intro" }));
+    const goToBoxesPage = useCallback(name => {
         apiClient
             .createTeam(name)
-            .then((team) => setGameState({ ...getGameState,team }))
+            .then((team) => {
+                setGameState({ ...getGameState, team, name });
+                setCurrentPage({ page: "Boxes" });
+            })
             .catch((err) => {
                 setGameState({ ...getGameState, error: err });
                 goToErrorPage();
             });
-    }, [getGameState]);
-
-    const returnToIndex = () => {
-        setGameState({ ...getGameState, error: null, name:''});
-        goToIntroPage()
-    }
+    });
+    const goToScorePage = useCallback(() => setCurrentPage({ page: "Score" }));
+    const goToErrorPage = useCallback(() => setCurrentPage({ page: "Error" }));
+    const returnToIndex = useCallback(() => {
+        setGameState(inital_game_state);
+        goToIntroPage();
+    });
 
     return (
         <>
             <Header />
             <br />
-            {getCurrentpage.page === "Intro" && (
-                <Intro setGameState={setGameState} getCurrentpage={getCurrentpage} goToBoxesPage={goToBoxesPage} />
-            )}
+            {getCurrentpage.page === "Intro" && <Intro startGame={goToBoxesPage}/>}
             {getCurrentpage.page === "Boxes" && <Boxes getGameState={getGameState} goToScorePage={goToScorePage} />}
             {getCurrentpage.page === "Score" && <Score getGameState={getGameState} setGameState={setGameState} />}
-            {getCurrentpage.page === "Error" && getGameState.error && <ErrorMessage error={getGameState.error} returnToIndex={returnToIndex} />}
+            {getCurrentpage.page === "Error" && getGameState.error && (
+                <ErrorMessage error={getGameState.error} returnToIndex={returnToIndex} />
+            )}
         </>
     );
 };
@@ -55,16 +55,18 @@ const ErrorMessage = ({ error, returnToIndex }) => (
     <div className="container">
         <div className="row">
             <div className="col-lg-12 text-center">
-                <h1 className="text-danger">Error: Britney Spears Would  Says - Oops!...I Did It Again - {error.message}</h1>
-            <button
-            className="btn btn-danger"
-            onClick={(e) => {
-                e.preventDefault();
-                returnToIndex()
-            }}
-            >
-                Return
-            </button>
+                <h1 className="text-danger">
+                    Error: Britney Spears Would Says - Oops!...I Did It Again - {error.message}
+                </h1>
+                <button
+                    className="btn btn-danger"
+                    onClick={(e) => {
+                        e.preventDefault();
+                        returnToIndex();
+                    }}
+                >
+                    Return
+                </button>
             </div>
         </div>
     </div>

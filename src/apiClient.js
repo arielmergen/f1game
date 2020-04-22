@@ -1,4 +1,6 @@
-const API_URI = process.env.REACT_APP_API_URI ? process.env.REACT_APP_API_URI : "https://backend-test-qfxw6.stensul.dev/";
+const API_URI = process.env.REACT_APP_API_URI
+    ? process.env.REACT_APP_API_URI
+    : "https://backend-test-qfxw6.stensul.dev/";
 
 function handleErrors(response) {
     if (!response.ok) {
@@ -7,6 +9,8 @@ function handleErrors(response) {
     return response;
 }
 
+const controller = new AbortController();
+
 const createTeam = (name) =>
     fetch(API_URI + "teams", {
         crossDomain: true,
@@ -14,40 +18,55 @@ const createTeam = (name) =>
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name }),
     })
-    .then(handleErrors)
-    .then((data) => data.json());
+        .then(handleErrors)
+        .then((data) => data.json());
 
-    const createCar = (name) =>
+const car = (carId) =>
     fetch(API_URI + "cars", {
         crossDomain: true,
         method: "POST",
-        headers: { "Content-Type": "application/json" }
+        headers: { "Content-Type": "application/json" },
     })
-    .then(handleErrors)
-    .then((data) => data.json());
+        .then(handleErrors)
+        .then((data) => data.json());
 
-const liftCar = (carId, mechanicId) => 
-fetch(API_URI + `cars/${carId}/lift`,{
-    crossDomain: true,
-    method: "POST",
-    headers: { "Content-Type": "application/json", "x-member-id": mechanicId },
-    body: JSON.stringify({carId}),
-})
-.then(handleErrors)
-.then((data) => data.json());
+const createCar = (name) =>
+    fetch(API_URI + "cars", {
+        crossDomain: true,
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+    })
+        .then(handleErrors)
+        .then((data) => data.json());
 
-// const getCar = (name) =>
-//     fetch(API_URI + "cars", {
-//         crossDomain: true,
-//         method: "POST",
-//         headers: { "Content-Type": "application/json" },
-//     }).then((data) => data.json());
+const liftCar = ({ carId, mechanicId }) =>
+    fetch(API_URI + `cars/${carId}/lift`, {
+        crossDomain: true,
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-member-id": mechanicId },
+        body: JSON.stringify({ carId }),
+    })
+        .then(handleErrors)
+        .then((data) => data.json());
 
-// const getTeam = (id) =>
-//     fetch(API_URI + "teams", {
-//         crossDomain: true,
-//         method: "GET",
-//         headers: { "Content-Type": "application/json" },
-//     }).then((data) => data.json());
+const fillTank = ({ carId, mechanicId }) =>
+    fetch(API_URI + `cars/${carId}/fill-tank`, {
+        crossDomain: true,
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-member-id": mechanicId },
+    }).then((data) => data.json());
 
-export default { createTeam, createCar, liftCar };
+const wheelAction = ({ mechanicId, carId, position, action }) =>
+    fetch(API_URI + `cars/${carId}/wheels/${position}/${action}`, {
+        crossDomain: true,
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-member-id": mechanicId },
+    }).then((data) => data.json());
+
+const check = ({ carId }) =>
+    fetch(API_URI + `cars/${carId}/check`, {
+        crossDomain: true,
+        method: "POST",
+    }).then((data) => data.json());
+
+export default { createTeam, createCar, liftCar, fillTank, wheelAction, check };

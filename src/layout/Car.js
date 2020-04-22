@@ -1,47 +1,49 @@
-import React, {useState, useEffect} from "react";
-import DragAreaWheel from '../components/wheel/DropAreaWheel';
-import DragAreaFront from '../components/Front/DropAreaFront';
-import './../css/grid.css';
+import React, { useState, useEffect } from "react";
 
+import { FRONT, FUEL } from "../constants";
 
+import DropArea from "../components/DragDrop/DropArea";
+import "./../css/grid.css";
 
 const insideStyle = {
     backgroundColor: "#cccccc",
     opacity: 0.5,
 };
-const Car = props =>{
-    const{setMechanicDropped, id, car, setCar}=props;
-    console.log("Car",car);
-    const[getState, setState] = useState({});
-    const[lifted, setLifted] = useState(false);
-    useEffect(()=>{
-        setLifted(car.lifted)
-    },[lifted,setLifted]);
-   return(
-        <div id={id} className={`car grid ${car.lifted ? 'car-lifted' : ''} `}>
-            {/*Create all Whhels*/}
-            {car.wheels.map((wheel)=>(
-                <DragAreaWheel key={wheel.position} 
-                position={wheel.position} 
-                statusWhweel={wheel.status} 
-                getState={getState} 
-                setState={setState}
-                setMechanicDropped={setMechanicDropped} 
-                style={{...(getState.isOver ? insideStyle : {}) }} 
-                className={wheel.position}>
-                </DragAreaWheel>
-            ))}
-               <DragAreaFront 
-               id={id} 
-               lifted={lifted} 
-               setLifted={setLifted}
-               getState={getState} 
-               setState={setState}
-               setMechanicDropped={setMechanicDropped}
-               className="front">
-               </DragAreaFront>
-        </div>
-    )
+
+const STATUS_WHEEL_STYLE = { 
+    "NEEDS_CHANGE": "need-change", 
+    "LOOSE": "loose", 
+    "READY": "ready" 
 }
+
+const Car = (props) => {
+    const { setMechanicDropped, car } = props;
+
+    return (
+        <div className={`car grid ${car.lifted ? "car-lifted" : ""} `}>
+            <h1>{car.lifted ? "Car Lifted" : ""}</h1>
+            <DropArea
+                areaData={{ position: FRONT }}
+                setDropedData={setMechanicDropped}
+                className="front"
+            ></DropArea>
+            {car.wheels.map(({ position, status }) => (
+                <DropArea
+                    key={position}
+                    areaData={{ position }}
+                    statusWheel={status}
+                    setDropedData={setMechanicDropped}
+                    overStyle={insideStyle}
+                    className={position + ' ' + STATUS_WHEEL_STYLE[status]}
+                />
+            ))}
+            <DropArea
+                areaData={{ position: FUEL }}
+                setDropedData={setMechanicDropped}
+                className="fuel"
+            ></DropArea>
+        </div>
+    );
+};
 
 export default Car;
