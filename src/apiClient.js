@@ -9,8 +9,6 @@ function handleErrors(response) {
     return response;
 }
 
-const controller = new AbortController();
-
 const createTeam = (name) =>
     fetch(API_URI + "teams", {
         crossDomain: true,
@@ -39,7 +37,7 @@ const createCar = (name) =>
         .then(handleErrors)
         .then((data) => data.json());
 
-const liftCar = ({ carId, mechanicId }) =>
+const liftCar = ({ carId, mechanicId }) => 
     fetch(API_URI + `cars/${carId}/lift`, {
         crossDomain: true,
         method: "POST",
@@ -69,4 +67,4 @@ const check = ({ carId }) =>
         method: "POST",
     }).then((data) => data.json());
 
-export default { createTeam, createCar, liftCar, fillTank, wheelAction, check };
+export default { createTeam, car, createCar, liftCar, fillTank, wheelAction, check };

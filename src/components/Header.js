@@ -3,7 +3,7 @@ import React from "react";
 const Header = (props) => {
     return (
         <>
-            <header className="masthead bg-danger text-white text-center pt-1 pb-2 mb-5">
+            <header className="masthead bg-danger text-white text-center pt-1 pb-2 mb-1">
                 <div className="container d-flex align-items-center flex-row">
                     <img className="masthead-avatar mb-5" src="/img/avataaars.svg" alt="" />
                     <h1 className="masthead-heading text-uppercase mb-0">F1 Game</h1>

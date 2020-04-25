@@ -24,25 +24,41 @@ const LABELS = {
     [FILL_TANK]: "Fill tank",
 };
 
-const ActionsForm = ({ role, setMechanicAction }) => (
-    <>
-        {role === MECHANIC && <Actions actions={MECHANIC_ACTIONS} setMechanicAction={setMechanicAction} />}
-        {role === JACKMAN && <Actions actions={JACKMAN_ACTIONS} setMechanicAction={setMechanicAction} />}
-        {role === GAS_MAN && <Actions actions={GAS_MAN_ACTIONS} setMechanicAction={setMechanicAction} />}
-    </>
-);
 
-const Actions = ({ actions, setMechanicAction }) => (
+const Actions = ({ actions, dispatchTask,selectedMechanic }) => {
+    return(
     <>
-        {actions.map((a) => (
-            <button id="change" type="button" className="btn btn-block btn-dark" onClick={(e) => {
+        {actions.map((a,index) => (
+            
+            <button key={LABELS[a]} id="change" type="button" className="btn btn-block btn-dark" onClick={(e) => {
                 e.preventDefault()
-                setMechanicAction(a) 
+                //setMechanicAction(a) 
+                dispatchTask({type:`${a}`,payload:selectedMechanic})
             }}>
                 {LABELS[a]}
             </button>
         ))}
     </>
+)
+}
+
+const ActionsForm = ({ role, dispatchTask, selectedMechanic }) => (
+    <>
+        {role === MECHANIC && <Actions 
+        selectedMechanic={selectedMechanic}
+        actions={MECHANIC_ACTIONS} 
+        dispatchTask={dispatchTask}/>}
+        {role === JACKMAN && <Actions 
+        selectedMechanic={selectedMechanic}
+        actions={JACKMAN_ACTIONS} 
+        dispatchTask={dispatchTask}
+        />} 
+        {role === GAS_MAN && <Actions
+            selectedMechanic={selectedMechanic}
+            actions={GAS_MAN_ACTIONS} 
+            dispatchTask={dispatchTask}/>} 
+    </>
 );
+
 
 export default ActionsForm;

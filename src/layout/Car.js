@@ -1,14 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 
 import { FRONT, FUEL } from "../constants";
 
 import DropArea from "../components/DragDrop/DropArea";
 import "./../css/grid.css";
-
-const insideStyle = {
-    backgroundColor: "#cccccc",
-    opacity: 0.5,
-};
 
 const STATUS_WHEEL_STYLE = { 
     "NEEDS_CHANGE": "need-change", 
@@ -17,33 +12,38 @@ const STATUS_WHEEL_STYLE = {
 }
 
 const Car = (props) => {
-    const { setMechanicDropped, car } = props;
-
-    return (
+    const { dispatchSelectedMechanic, car } = props;
+    const {loading} = car;
+        return (
+        <>
+         {!loading && 
         <div className={`car grid ${car.lifted ? "car-lifted" : ""} `}>
-            <h1>{car.lifted ? "Car Lifted" : ""}</h1>
             <DropArea
+                dispatchSelectedMechanic={dispatchSelectedMechanic}
                 areaData={{ position: FRONT }}
-                setDropedData={setMechanicDropped}
                 className="front"
-            ></DropArea>
+            />
             {car.wheels.map(({ position, status }) => (
-                <DropArea
-                    key={position}
-                    areaData={{ position }}
-                    statusWheel={status}
-                    setDropedData={setMechanicDropped}
-                    overStyle={insideStyle}
-                    className={position + ' ' + STATUS_WHEEL_STYLE[status]}
-                />
+            <DropArea
+                key={position}
+                areaData={{ position }}
+                statusWheel={status}
+                // setDropedData={setMechanicDropped}
+                dispatchSelectedMechanic={dispatchSelectedMechanic}
+                className={position + ' ' + STATUS_WHEEL_STYLE[status]}
+            />
             ))}
             <DropArea
                 areaData={{ position: FUEL }}
-                setDropedData={setMechanicDropped}
+                // setDropedData={setMechanicDropped}
+                dispatchSelectedMechanic={dispatchSelectedMechanic}
                 className="fuel"
-            ></DropArea>
+            />
         </div>
-    );
+}</>
+        
+
+    )
 };
 
 export default Car;

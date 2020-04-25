@@ -1,32 +1,37 @@
 import React, { useState } from "react";
 
 const DragArea = (props) => {
-    const { setDropedData, getState, setState, areaData, status, className, overStyle } = props;
+    const { dispatchSelectedMechanic, isOver, areaData, className } = props;
 
     const dragOver = (ev) => {
         ev.preventDefault();
         ev.dataTransfer.dropEffect = props.dropEffect;
+        // setIsOver(true);
     };
 
     const drop = (ev) => {
         let itemDropped = JSON.parse(ev.dataTransfer.getData("drag-item"));
-        setState({ ...getState, display: true, itemDropped, setIsOver: false });
-        setDropedData({ itemData: { ...itemDropped }, areaData: { ...areaData } });
+        // setState({ ...getState, display: true, itemDropped, setIsOver: false });
+        // setDropedData({ itemData: { ...itemDropped }, areaData: { ...areaData } });
+        dispatchSelectedMechanic({type:'MECHANIC_SELECTED', payload:{mechanic:itemDropped, droppedin:areaData }});
     };
 
     const dragEnter = (ev) => {
         ev.dataTransfer.dropEffect = "link";
-        setState({ ...getState, setIsOver: false });
+        // setState({ ...getState, setIsOver: true });
     };
 
-    // const dragLeave = () => setIsOver(false);
+    const dragLeave = () =>console.log(false);
+
+
 
     return (
         <div
             onDragOver={dragOver}
             onDrop={drop}
             onDragEnter={dragEnter}
-            className={className}
+            onDragLeave={dragLeave}
+            className={`${className} ${isOver ? 'overstyle' : ''}` }
         >
             {props.children}
         </div>
@@ -34,21 +39,17 @@ const DragArea = (props) => {
 };
 
 const DropArea = (props) => {
-    const { id, className, overStyle = null, setDropedData, areaData } = props;
+    const { id, className, dispatchSelectedMechanic, areaData } = props;
     const [isOver, setIsOver] = useState(false);
     const [getState, setState] = useState(null);
 
     return (
         <DragArea
             id={id}
-            getState={getState}
-            setState={setState}
             isOver={isOver}
-            setIsOver={setIsOver}
-            setDropedData={setDropedData}
             areaData={areaData}
+            dispatchSelectedMechanic={dispatchSelectedMechanic}
             className={className}
-            overStyle={overStyle ? overStyle : ""}
         >
             {props.children}
         </DragArea>

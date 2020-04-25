@@ -1,8 +1,5 @@
-import React, { useState, useRef } from "react";
+import React from "react";
 
-const draggingStyle = {
-    opacity: 0.25,
-};
 
 const DraggeableItem = (props) => {
     const { dataitem, dropeffect, setisDragging } = props;

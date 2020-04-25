@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 const UserForm = (props) => {
-    const { setUserState, goToRulesScreen, startGame } = props;
+    const {goToRulesScreen, startGame } = props;
 
     const [getName, setName] = useState({});
     const [error, setError] = useState(false);

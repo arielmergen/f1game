@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 
 import apiClient from "../apiClient";
 
@@ -6,7 +6,6 @@ import Header from "./../components/Header";
 import Intro from "./../screens/intro";
 import Boxes from "./../screens/boxes";
 import Score from "./../screens/score";
-import Rules from "./../components/Rules";
 import "./../css/styles.css";
 
 const inital_game_state = { name: null, team: null, error: null };
@@ -17,7 +16,8 @@ const Index = (props) => {
         page: "Intro",
     });
 
-    const goToIntroPage = useCallback(() => setCurrentPage({ page: "Intro" }));
+    const goToErrorPage = useCallback(() => setCurrentPage({ page: "Error" }),[]);
+    const goToIntroPage = useCallback(() => setCurrentPage({ page: "Intro" }),[]);
     const goToBoxesPage = useCallback(name => {
         apiClient
             .createTeam(name)
@@ -29,13 +29,12 @@ const Index = (props) => {
                 setGameState({ ...getGameState, error: err });
                 goToErrorPage();
             });
-    });
-    const goToScorePage = useCallback(() => setCurrentPage({ page: "Score" }));
-    const goToErrorPage = useCallback(() => setCurrentPage({ page: "Error" }));
+    },[getGameState,goToErrorPage]);
+    const goToScorePage = useCallback(() => setCurrentPage({ page: "Score" }),[]);
     const returnToIndex = useCallback(() => {
         setGameState(inital_game_state);
         goToIntroPage();
-    });
+    },[goToIntroPage]);
 
     return (
         <>
@@ -49,6 +48,8 @@ const Index = (props) => {
             )}
         </>
     );
+
+                
 };
 
 const ErrorMessage = ({ error, returnToIndex }) => (
