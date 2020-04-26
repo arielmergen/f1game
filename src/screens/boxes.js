@@ -207,6 +207,7 @@ const initialStateMechanicSelected = {
     id: "",
     name: "",
     rol: "",
+    image: "",
     droppedin: {},
 };
 
@@ -218,6 +219,7 @@ const reducerSelectedMechanic = (state, action) => {
                 id: action.payload.mechanic.id,
                 name: action.payload.mechanic.name,
                 role: action.payload.mechanic.role,
+                image: action.payload.mechanic.image,
                 droppedin: action.payload.droppedin,
             };
         case "MECHANIC_UNSELECTED":
@@ -249,13 +251,10 @@ const Boxes = (props) => {
     );
     const [positionActive, setPositionActive] = useState({});
     const [isLoadingPage, setisLoadingPage] = useState(false);
-    const [sending, setSending] = useState(false);
+    const [checkStatus, setCheckStatus] = useState(false);
+    const [statusInternalCar, setStatusInternalCar] = useState({});
+    const [statusCar, setStatusCar] = useState({});
     const { team } = getGameState;
-
-    // const [getInternalPositionTeam, setInternalPositionTeam] = useState(
-    //     // TODO: remove duplicated id key in the reduced object
-    //     team.members.reduce((obj, member) => ({ ...obj, [member.id]: member }), {})
-    // );
 
     useEffect(() => {
         dispatchCar({ type: "FETCH_START" });
@@ -263,6 +262,27 @@ const Boxes = (props) => {
             dispatchCar({ type: "FETCH_FINISH", payload: car });
         });
     }, []);
+
+    useEffect(() => {
+        if (stateCar.id === "") return;
+
+        let cardId = stateCar.id;
+        const checkStatusCar = (cardId) => {
+            apiClient
+                .check(cardId)
+                .then((response) => {
+                    setCheckStatus(false);
+                    setStatusCar(response);
+                })
+                .catch((error) => console.log(error));
+        };
+        checkStatusCar(cardId);
+    }, [checkStatus]);
+
+    /*Internal status*/
+    useEffect(() => {
+        console.log(statusInternalCar);
+    }, [statusInternalCar]);
 
     useEffect(() => {
         if (!stateCar.loading) {
@@ -288,13 +308,27 @@ const Boxes = (props) => {
     useEffect(() => {
         if (!stateTask.isActive) return;
         if (LIFT_CAR === stateTask.task) {
-            console.log(stateTask.droppedin.position);
             if ("front" !== stateTask.droppedin.position) {
                 dispatchMessageTask({
                     type: "FETCH_TASK_ERROR",
                     payload: {
                         code: 1024,
-                        message: "You can only lift the car from the front",
+                        message:
+                            "Um..,Boss.., Can only lift the car from the front",
+                    },
+                });
+                return;
+            }
+
+            if (
+                Object.keys(statusInternalCar).length !== 0 &&
+                statusInternalCar.lifted
+            ) {
+                dispatchMessageTask({
+                    type: "FETCH_TASK_ERROR",
+                    payload: {
+                        code: 1024,
+                        message: "Um..., Boss...The car is Lifted",
                     },
                 });
                 return;
@@ -323,11 +357,17 @@ const Boxes = (props) => {
                             type: "FETCH_FINISH",
                             payload: response,
                         });
+                        setStatusInternalCar({
+                            ...statusInternalCar,
+                            lifted: response.lifted,
+                        });
                         dispatchTask({ type: "FINISH_TASK" });
                         dispatchMessageTask({
                             type: "FETCH_TASK_END",
                             payload: { task: LIFT_CAR, isFinish: true },
                         });
+
+                        setCheckStatus(true);
                     }
                 })
                 .catch((error) => {
@@ -343,11 +383,145 @@ const Boxes = (props) => {
                 stateTask.droppedin.position === "front" ||
                 stateTask.droppedin.position === "fuel"
             ) {
-                alert(
-                    "La tarea que intenta realizar no esta permitida en este sector"
-                );
+                dispatchMessageTask({
+                    type: "FETCH_TASK_ERROR",
+                    payload: {
+                        code: 14,
+                        message: "Um..., Boss...That isn´t the wheel.",
+                    },
+                });
                 return;
             }
+
+            if (
+                stateTask.mechanic.role === JACKMAN &&
+                !statusInternalCar.hasOwnProperty("wheel")
+            ) {
+                dispatchMessageTask({
+                    type: "FETCH_TASK_ERROR",
+                    payload: {
+                        code: 1024,
+                        message:
+                            "Um..., Boss... Before do you need Unfasten the wheel.",
+                    },
+                });
+                return;
+            }
+
+            if (Object.keys(statusInternalCar).length === 0) {
+                dispatchMessageTask({
+                    type: "FETCH_TASK_ERROR",
+                    payload: {
+                        code: 12,
+                        message:
+                            "You do need to Lift the car for this action...",
+                    },
+                });
+                return;
+            }
+
+            if (
+                stateTask.task === FASTEN_WHEEL &&
+                !statusInternalCar.hasOwnProperty("wheel")
+            ) {
+                dispatchMessageTask({
+                    type: "FETCH_TASK_ERROR",
+                    payload: {
+                        code: 14,
+                        message:
+                            "To this action you do need unfasten the wheel first action (Press de button Unfasten)",
+                    },
+                });
+                return;
+            }
+
+            if (statusInternalCar.hasOwnProperty("wheel")) {
+                if (
+                    stateTask.task === UNFASTEN_WHEEL &&
+                    statusInternalCar.wheel[stateTask.droppedin.position] ===
+                        "LOOSE"
+                ) {
+                    dispatchMessageTask({
+                        type: "FETCH_TASK_ERROR",
+                        payload: {
+                            code: 14,
+                            message: "Um..., Boss...The wheel is Unfasten",
+                        },
+                    });
+                    return;
+                }
+
+                if (
+                    stateTask.task === CHANGE_WHEEL &&
+                    statusInternalCar.wheel[stateTask.droppedin.position] ===
+                        "CHANGED"
+                ) {
+                    dispatchMessageTask({
+                        type: "FETCH_TASK_ERROR",
+                        payload: {
+                            code: 14,
+                            message:
+                                "Um..., Boss...The wheel has already Changed",
+                        },
+                    });
+                    return;
+                }
+
+                if (
+                    stateTask.task === FASTEN_WHEEL &&
+                    statusInternalCar.wheel[stateTask.droppedin.position] ===
+                        "READY"
+                ) {
+                    dispatchMessageTask({
+                        type: "FETCH_TASK_ERROR",
+                        payload: {
+                            code: 14,
+                            message:
+                                "Um..., Boss...The wheel already was changed and Fasten...",
+                        },
+                    });
+                    return;
+                }
+
+                if (
+                    stateTask.task === CHANGE_WHEEL &&
+                    statusInternalCar.wheel[stateTask.droppedin.position] !==
+                        "LOOSE"
+                ) {
+                    dispatchMessageTask({
+                        type: "FETCH_TASK_ERROR",
+                        payload: {
+                            code: 14,
+                            message:
+                                "Um..., Boss...to this action you do need unfasten the wheel first action (Press de button Unfasten)",
+                        },
+                    });
+                    return;
+                }
+                if (
+                    stateTask.task === FASTEN_WHEEL &&
+                    statusInternalCar.wheel[stateTask.droppedin.position] !==
+                        "CHANGE"
+                ) {
+                    dispatchMessageTask({
+                        type: "FETCH_TASK_ERROR",
+                        payload: {
+                            code: 14,
+                            message:
+                                "Um..., Boss...to this action you do need change the wheel first (Press de button Change)",
+                        },
+                    });
+                    return;
+                }
+            }
+            dispatchMessageTask({
+                type: "FETCH_TASK_ERROR",
+                payload: {
+                    code: 12,
+                    message: "You do need to Lift the car for this action...",
+                },
+            });
+
             dispatchMessageTask({
                 type: "FETCH_TASK_START",
                 payload: { task: stateTask.task, isFinish: false },
@@ -359,6 +533,7 @@ const Boxes = (props) => {
                 position: stateTask.droppedin.position,
                 action: stateTask.task,
             };
+
             apiClient
                 .wheelAction(data)
                 .then((response) => {
@@ -386,6 +561,8 @@ const Boxes = (props) => {
                             },
                         });
                         dispatchTask({ type: "FETCH_TASK_END" });
+
+                        //setStatusInternalCar({...statusInternalCar, lifted: response.lifted});
                     } else {
                         dispatchCar({
                             type: "FETCH_FINISH",
@@ -396,6 +573,19 @@ const Boxes = (props) => {
                             type: "FETCH_TASK_END",
                             payload: { task: stateTask.task, isFinish: true },
                         });
+                        response.wheels.filter((wheel) => {
+                            if (
+                                wheel.position === stateTask.droppedin.position
+                            ) {
+                                setStatusInternalCar({
+                                    ...statusInternalCar,
+                                    wheel: {
+                                        [stateTask.droppedin.position]:
+                                            wheel.status,
+                                    },
+                                });
+                            }
+                        });
                     }
                 })
                 .catch((error) => {
@@ -403,6 +593,18 @@ const Boxes = (props) => {
                 });
         }
         if (FILL_TANK === stateTask.task) {
+            console.log(stateTask);
+            if (stateTask.droppedin.position !== "fuel") {
+                dispatchMessageTask({
+                    type: "FETCH_TASK_ERROR",
+                    payload: {
+                        code: 1024,
+                        message:
+                            "You can only load gasoline from the Fuel position",
+                    },
+                });
+                return;
+            }
             const data = {
                 mechanicId: stateTask.mechanic.id,
                 carId: stateCar.id,
@@ -441,7 +643,6 @@ const Boxes = (props) => {
                 });
         }
         return () => {
-            setSending(false);
             dispatchTask({ type: "" });
         };
     }, [stateTask]);
@@ -471,7 +672,7 @@ const Boxes = (props) => {
             </div>
             <div className="row">
                 <div className="col-9 pr-0 pl-0">
-                    {stateCar && (
+                    {isLoadingPage && (
                         <MechanicContainer
                             team={team}
                             dispatchSelectedMechanic={dispatchSelectedMechanic}

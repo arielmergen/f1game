@@ -9,7 +9,6 @@ const DraggeableCard = (props) => {
     } = props;
 
     const startDrag = (ev) => {
-        console.log(member.image);
         ev.dataTransfer.setData("text/uri-list", member.image);
         ev.dataTransfer.setData("text", member.id);
         ev.dataTransfer.setData("drag-item", JSON.stringify({ ...member }));
@@ -30,6 +29,7 @@ const DraggeableCard = (props) => {
                     name: member.name,
                     role: member.role,
                     selected: member.selected,
+                    image: member.image,
                 };
                 dispatchSelectedMechanic({
                     type: "MECHANIC_SELECTED",

@@ -18,15 +18,38 @@ const UNFASTEN_WHEEL_MESSAGE = "Wheel is UnFasten";
 const FASTEN_WHEEL_MESSAGE = "Wheel is Fasten";
 const CHANGE_WHEEL_MESSAGE = "The wheel has been changed...";
 const FILL_TANK_MESSAGE = "Full tank";
-const LIFT_CAR_LIFT_MESSAGE = "Lifting the car";
+const LIFT_CAR_LIFT_MESSAGE = "Ready...,The car is lifted";
 
 toast.configure();
 
+const Msg = (props) => {
+    return (
+        <div className="card border-light mb-3">
+            <div className="row no-gutters">
+                <div className="col-md-4">
+                    <img
+                        src={props.image}
+                        className="card-img"
+                        alt="mechanic"
+                    />
+                </div>
+                <div className="col-md-8">
+                    <div className="card-body">
+                        <p className="card-text">{props.message}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 const SelectedMechanic = (props) => {
     const { selectedMechanic, dispatchTask, stateMessageTask } = props;
-    const { id, name, role, droppedin } = selectedMechanic;
+    const { id, name, role, image, droppedin } = selectedMechanic;
 
     const [mechanicWasSelected, setmechanicWasSelected] = useState(false);
+
+    let toastId = null;
 
     useEffect(() => {
         if (selectedMechanic && selectedMechanic.selected) {
@@ -38,7 +61,6 @@ const SelectedMechanic = (props) => {
     }, [selectedMechanic, selectedMechanic.selected]);
 
     useEffect(() => {
-        console.log(stateMessageTask);
         if (
             stateMessageTask.code === 1024 ||
             stateMessageTask.code === 6 ||
@@ -47,19 +69,24 @@ const SelectedMechanic = (props) => {
             stateMessageTask.code === 14 ||
             stateMessageTask.code === 18
         ) {
-            toast.error(stateMessageTask.message, {
+            // toast.error(stateMessageTask.message, {
+            //     position: toast.POSITION.TOP_RIGHT,
+            // });
+            toast(<Msg message={stateMessageTask.message} image={image} />, {
                 position: toast.POSITION.TOP_RIGHT,
             });
             return;
         }
+
         if (stateMessageTask.task && !stateMessageTask.isFinish) {
-            toast.info(PROCESSING, {
+            toastId = toast.info(PROCESSING, {
                 position: toast.POSITION.TOP_RIGHT,
             });
         }
         if (stateMessageTask.task === LIFT_CAR && stateMessageTask.isFinish) {
-            toast.success(LIFT_CAR_LIFT_MESSAGE, {
+            toast(<Msg message={LIFT_CAR_LIFT_MESSAGE} image={image} />, {
                 position: toast.POSITION.TOP_RIGHT,
+                autoclose: 1000,
             });
         }
 
@@ -67,7 +94,7 @@ const SelectedMechanic = (props) => {
             stateMessageTask.isFinish &&
             stateMessageTask.task === UNFASTEN_WHEEL
         ) {
-            toast.success(UNFASTEN_WHEEL_MESSAGE, {
+            toast(<Msg message={UNFASTEN_WHEEL_MESSAGE} image={image} />, {
                 position: toast.POSITION.TOP_RIGHT,
             });
         }
@@ -75,7 +102,7 @@ const SelectedMechanic = (props) => {
             stateMessageTask.isFinish &&
             stateMessageTask.task === FASTEN_WHEEL
         ) {
-            toast.success(FASTEN_WHEEL_MESSAGE, {
+            toast(<Msg message={FASTEN_WHEEL_MESSAGE} image={image} />, {
                 position: toast.POSITION.TOP_RIGHT,
             });
         }
