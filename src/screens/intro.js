@@ -12,10 +12,17 @@ const Intro = ({ startGame }) => {
     return (
         <div className={`container`}>
             {getUserScreen.screen === "UserForm" && (
-                <UserForm getUserScreen={getUserScreen} goToRulesScreen={goToRulesScreen} startGame={startGame} />
+                <UserForm
+                    getUserScreen={getUserScreen}
+                    goToRulesScreen={goToRulesScreen}
+                    startGame={startGame}
+                />
             )}
             {getUserScreen.screen === "Rules" && (
-                <Rules setUserScreen={setUserScreen} goToUserFormScreen={goToUserFormScreen} />
+                <Rules
+                    setUserScreen={setUserScreen}
+                    goToUserFormScreen={goToUserFormScreen}
+                />
             )}
         </div>
     );

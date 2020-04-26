@@ -1,13 +1,7 @@
-import {useEffect} from 'react';
-
+import { useEffect } from "react";
 
 const useMessageManager = (task) => {
-    
-    useEffect(()=>{
-        
-    },task)
+    useEffect(() => {}, task);
+};
 
-}
-
-
-export default useMessageManager
+export default useMessageManager;

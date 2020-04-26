@@ -1,4 +1,3 @@
-
 /*Technician actions in the Api*/
 export const LIFT_CAR = "lift";
 export const CHECK = "check";
@@ -6,7 +5,6 @@ export const UNFASTEN_WHEEL = "unfasten";
 export const FASTEN_WHEEL = "fasten";
 export const CHANGE_WHEEL = "change";
 export const FILL_TANK = "fill-tank";
-
 
 /*Actions the can make  the Technician per rol in the team */
 export const MECHANIC = "mechanic";
@@ -17,7 +15,6 @@ export const JACKMAN_ACTIONS = [LIFT_CAR, CHANGE_WHEEL, CHECK];
 
 export const GAS_MAN = "gasman";
 export const GAS_MAN_ACTIONS = [FILL_TANK];
-
 
 /*Estatus de las ruedas*/
 export const NEEDS_CHANGE = "NEEDS_CHANGE";
@@ -30,7 +27,6 @@ export const CAR_WHEEL_STATES = [NEEDS_CHANGE, LOOSE, REMOVED, PLACED, CHANGED];
 /*Position of the car*/
 export const FRONT = "front";
 export const FUEL = "fuel";
-
 
 /*Position of the wheels in the car*/
 export const FRONT_LEFT = "front-left";

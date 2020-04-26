@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 const UserForm = (props) => {
-    const {goToRulesScreen, startGame } = props;
+    const { goToRulesScreen, startGame } = props;
 
     const [getName, setName] = useState({});
     const [error, setError] = useState(false);
@@ -76,7 +76,11 @@ const UserForm = (props) => {
                                 value={name || ""}
                                 onChange={onchange}
                             />
-                            {error ? <p className="help-block text-danger">Please set your Team Name</p> : null}
+                            {error ? (
+                                <p className="help-block text-danger">
+                                    Please set your Team Name
+                                </p>
+                            ) : null}
                         </div>
                         <div className="form-group mt-4">
                             <button
