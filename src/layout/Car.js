@@ -13,6 +13,7 @@ const STATUS_WHEEL_STYLE = {
 
 const Car = (props) => {
     const { dispatchSelectedMechanic, car } = props;
+
     const {loading} = car;
         return (
         <>

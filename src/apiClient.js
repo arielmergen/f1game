@@ -3,9 +3,10 @@ const API_URI = process.env.REACT_APP_API_URI
     : "https://backend-test-qfxw6.stensul.dev/";
 
 function handleErrors(response) {
-    if (!response.ok) {
-        throw Error(response.statusText);
-    }
+    // if (!response.ok) {
+    //     throw Error(response.statusText);
+    // }
+
     return response;
 }
 

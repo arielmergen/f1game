@@ -68,6 +68,39 @@ body {
   justify-content: space-between;
   padding-left: 0px;
 }
+.card:hover{
+    cursor: move; /* fallback if grab cursor is unsupported */
+    cursor: grab;
+    cursor: -moz-grab;
+    cursor: -webkit-grab;
+}
+
+.card:active {
+  cursor: grabbing;
+  cursor: -moz-grabbing;
+  cursor: -webkit-grabbing;
+}
+
+/*DROP AREA*/
+.overstyle{
+  -webkit-box-shadow: 10px 10px 9px 0px rgba(0,0,0,0.75);
+  -moz-box-shadow: 10px 10px 9px 0px rgba(0,0,0,0.75);
+  box-shadow: 10px 10px 9px 0px rgba(0,0,0,0.75);
+  cursor: grabbing;
+  cursor: -moz-grabbing;
+  cursor: -webkit-grabbing;
+  opacity: 1;
+}
+.card img{
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+}
+img.card-mechanic{
+  width: 100px;
+  margin: 10px auto;
+}
 
 ul.mechanic li{
   text-align: center;

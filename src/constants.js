@@ -1,7 +1,7 @@
 
 /*Technician actions in the Api*/
 export const LIFT_CAR = "lift";
-export const UNLIFT_CAR = "unlifted";
+export const CHECK = "check";
 export const UNFASTEN_WHEEL = "unfasten";
 export const FASTEN_WHEEL = "fasten";
 export const CHANGE_WHEEL = "change";
@@ -13,7 +13,7 @@ export const MECHANIC = "mechanic";
 export const MECHANIC_ACTIONS = [UNFASTEN_WHEEL, CHANGE_WHEEL, FASTEN_WHEEL];
 
 export const JACKMAN = "jackman";
-export const JACKMAN_ACTIONS = [LIFT_CAR, CHANGE_WHEEL, UNLIFT_CAR];
+export const JACKMAN_ACTIONS = [LIFT_CAR, CHANGE_WHEEL, CHECK];
 
 export const GAS_MAN = "gasman";
 export const GAS_MAN_ACTIONS = [FILL_TANK];

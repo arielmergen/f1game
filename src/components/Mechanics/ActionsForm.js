@@ -8,7 +8,7 @@ import {
     GAS_MAN,
     GAS_MAN_ACTIONS,
     LIFT_CAR,
-    UNLIFT_CAR,
+    CHECK,
     UNFASTEN_WHEEL,
     FASTEN_WHEEL,
     CHANGE_WHEEL,
@@ -17,7 +17,7 @@ import {
 
 const LABELS = {
     [LIFT_CAR]: "Lift",
-    [UNLIFT_CAR]: "Unlift",
+    [CHECK]: "Check",
     [UNFASTEN_WHEEL]: "Unfasten",
     [FASTEN_WHEEL]: "Fasten",
     [CHANGE_WHEEL]: "Change",
@@ -25,16 +25,24 @@ const LABELS = {
 };
 
 
-const Actions = ({ actions, dispatchTask,selectedMechanic }) => {
+const executeTask = (ev, task, selectedMechanic, dispatchTask) => {
+
+    ev.preventDefault();
+    const data ={
+        mechanic:selectedMechanic,
+        isActive:true
+    }
+
+    dispatchTask({type:`${task}`,payload:{data}});
+}
+
+const Actions = ({ actions, dispatchTask, selectedMechanic }) => {
+    
     return(
     <>
         {actions.map((a,index) => (
             
-            <button key={LABELS[a]} id="change" type="button" className="btn btn-block btn-dark" onClick={(e) => {
-                e.preventDefault()
-                //setMechanicAction(a) 
-                dispatchTask({type:`${a}`,payload:selectedMechanic})
-            }}>
+            <button key={LABELS[a]} id="change" type="button" className="btn btn-block btn-dark" onClick={(ev)=>executeTask(ev,a,selectedMechanic,dispatchTask)}>
                 {LABELS[a]}
             </button>
         ))}

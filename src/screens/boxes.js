@@ -4,13 +4,10 @@ import apiClient from "./../apiClient";
 //import { MECHANIC_PLACE_RULES, WHEEL_ACTIONS, WHEEL_POSITIONS, FILL_TANK, LIFT_CAR, JACKMAN } from "../constants";
 import {
     MECHANIC,
-    MECHANIC_ACTIONS,
     JACKMAN,
-    JACKMAN_ACTIONS,
     GAS_MAN,
-    GAS_MAN_ACTIONS,
     LIFT_CAR,
-    UNLIFT_CAR,
+    CHECK,
     UNFASTEN_WHEEL,
     FASTEN_WHEEL,
     CHANGE_WHEEL,
@@ -27,49 +24,127 @@ const initialStateTask = {
     isActive:false,
     droppedin:'',
     task:'',
-    mechanic:{}
+    mechanic:{},
+    error:true,
+    code:0
 
 }
 const reducerTask = (state, action) =>{
+    // console.log(action)
     switch(action.type){
         case LIFT_CAR:
             return{
-                isActive:true,
-                droppedin:action.payload.droppedin,
+                isActive:action.payload.data.isActive,
+                droppedin:action.payload.data.mechanic.droppedin,
                 task:action.type,
                 mechanic:{
-                    id:action.payload.id,
-                    role:action.payload.role
-                }
+                    id:action.payload.data.mechanic.id,
+                    role:action.payload.data.mechanic.role
+                },
+                error:false,
            }
-        case GAS_MAN_ACTIONS:
+        case CHANGE_WHEEL:
             return{
-                isFinish:false,
-                task:'',
-                mechanic:{}
-            }
-        case MECHANIC_ACTIONS:
+                isActive:action.payload.data.isActive,
+                droppedin:action.payload.data.mechanic.droppedin,
+                task:action.type,
+                mechanic:{
+                    id:action.payload.data.mechanic.id,
+                    role:action.payload.data.mechanic.role
+                },
+                error:false,
+        }
+        case CHECK:
             return{
-                isFinish:true,
-                task:'',
-                mechanic:{}
+                isActive:action.payload.data.isActive,
+                droppedin:action.payload.data.mechanic.droppedin,
+                task:action.type,
+                mechanic:{
+                    id:action.payload.data.mechanic.id,
+                    role:action.payload.data.mechanic.role
+                },
+                error:false,
+        }
+        case UNFASTEN_WHEEL:
+            return{
+                isActive:action.payload.data.isActive,
+                droppedin:action.payload.data.mechanic.droppedin,
+                task:action.type,
+                mechanic:{
+                    id:action.payload.data.mechanic.id,
+                    role:action.payload.data.mechanic.role
+                },
+                error:false,
             }
-        case MECHANIC_ACTIONS:
-                return{
-                    isFinish:true,
-                    task:'',
-                    mechanic:{}
-                   }
+        case FASTEN_WHEEL:
+            return{
+                isActive:action.payload.data.isActive,
+                droppedin:action.payload.data.mechanic.droppedin,
+                task:action.type,
+                mechanic:{
+                    id:action.payload.data.mechanic.id,
+                    role:action.payload.data.mechanic.role
+                },
+                error:false,
+        }
+        case FILL_TANK:
+            return{
+                isActive:action.payload.data.isActive,
+                droppedin:action.payload.data.mechanic.droppedin,
+                task:action.type,
+                mechanic:{
+                    id:action.payload.data.mechanic.id,
+                    role:action.payload.data.mechanic.role
+                },
+                error:false,
+        }
+        case CHECK:
+            return{
+                isActive:action.payload.data.isActive,
+                droppedin:action.payload.data.mechanic.droppedin,
+                task:action.type,
+                mechanic:{
+                    id:action.payload.data.mechanic.id,
+                    role:action.payload.data.mechanic.role
+                },
+                error:false,
+        }
+        case 'FINISH_TASK' :
+            return state;
+        default : return state;
+    }
+}
+
+const initialTaskMessage = {
+    isFinish:true,
+    task:'',
+    error:true,
+    code:0,
+    message:'',
+}
+
+
+const reducerTaskMessage = (state,action) =>{
+    switch(action.type){
         case 'FETCH_TASK_START':
             return{
-                isFinish:false,
-                task:LIFT_CAR
+                isFinish:action.payload.isFinish,
+                task:action.payload.task
             }
-            case 'FETCH_TASK_END':
-                return{
-                    isFinish:true,
-                    task:LIFT_CAR
-                }
+        case 'FETCH_TASK_END':
+            return{
+                isFinish:action.payload.isFinish,
+                task:action.payload.task
+        }
+        case 'FETCH_TASK_ERROR':
+            return{
+                isFinish:true,
+                task:action.payload.task,
+                error:true,
+                code:action.payload.code,
+                message:action.payload.message,
+        }
+        default : return state;
     }
 }
 
@@ -128,8 +203,10 @@ const reducerCar = (state, action) =>{
     }
 }
 
+//SELECT MECHANIC
 const initialStateMechanicSelected = {
     loading:true,
+    selected:false,
     id:'',
     name:'',
     rol:'',
@@ -144,7 +221,7 @@ const reducerSelectedMechanic = (state, action) =>{
             id:action.payload.mechanic.id,
             name:action.payload.mechanic.name,
             role:action.payload.mechanic.role,
-            droppedin:action.payload.droppedin.position
+            droppedin:action.payload.droppedin
         }
     case 'MECHANIC_UNSELECTED':
         return{
@@ -165,16 +242,19 @@ const Boxes = (props) => {
     const { getGameState } = props;
  
     const[stateTask, dispatchTask] = useReducer(reducerTask,initialStateTask);
+    const[stateMessageTask, dispatchMessageTask] = useReducer(reducerTaskMessage, initialTaskMessage);
     const[stateCar, dispatchCar] = useReducer(reducerCar,initialStateCar);
     const[stateTeam, dispatchTeam] = useReducer(reducerTeam,initialStateTeam);
     const[stateMechanicSelected, dispatchSelectedMechanic] =useReducer(reducerSelectedMechanic, initialStateMechanicSelected);
+    const[positionActive, setPositionActive] = useState({});
     const[isLoadingPage, setisLoadingPage] = useState(false);
+    const[sending, setSending] = useState(false);
     const { team } = getGameState;
 
-    const [getInternalPositionTeam, setInternalPositionTeam] = useState(
-        // TODO: remove duplicated id key in the reduced object
-        team.members.reduce((obj, member) => ({ ...obj, [member.id]: member }), {})
-    );
+    // const [getInternalPositionTeam, setInternalPositionTeam] = useState(
+    //     // TODO: remove duplicated id key in the reduced object
+    //     team.members.reduce((obj, member) => ({ ...obj, [member.id]: member }), {})
+    // );
  
     useEffect(() => {
         dispatchCar({type:'FETCH_START'});
@@ -192,116 +272,123 @@ const Boxes = (props) => {
 
 
     useEffect(()=>{
-        if(stateTask && stateTask.isActive){
-            if(stateTask.task === LIFT_CAR){
-                dispatchCar({type:'FETCH_START'});
-                dispatchTask({type:'FETCH_TASK_START'});
+        if(stateMechanicSelected.selected){
+            setPositionActive({...positionActive,[stateMechanicSelected.id]:stateMechanicSelected});
+        }
+        return()=>{
+            setPositionActive('');
+        }
+    },[stateMechanicSelected]);
+    
+useEffect(()=>{
+
+},[positionActive])
+
+
+/*MAnage TASKS*/
+    useEffect(()=>{
+
+            if(!stateTask.isActive) return;
+            if(LIFT_CAR===stateTask.task){
+                console.log(stateTask.droppedin.position);
+                if('front'!==stateTask.droppedin.position){
+                    
+                    dispatchMessageTask({type:'FETCH_TASK_ERROR', payload:{code:1024, message:'You can only lift the car from the front'}});
+                    return;
+                }
+                dispatchMessageTask({type:'FETCH_TASK_START', payload:{task:LIFT_CAR, isFinish:false}});
                 const data = {
                     carId:stateCar.id,
                     mechanicId:stateTask.mechanic.id,
                 }
                 apiClient.liftCar(data)
+                    .then(response=>{
+                        if(response.code===18){
+                            dispatchMessageTask({type:'FETCH_TASK_ERROR', payload:{code:response.code,message:response.message}});
+                        }else{
+                            dispatchCar({type:'FETCH_FINISH',payload:response});
+                            dispatchTask({type:'FINISH_TASK'})
+                            dispatchMessageTask({type:'FETCH_TASK_END', payload:{task:LIFT_CAR, isFinish:true}});
+                        }
+                }).catch(error=>{
+                    console.log(error);
+                })
+            };
+            if(CHANGE_WHEEL===stateTask.task || UNFASTEN_WHEEL===stateTask.task ||
+            FASTEN_WHEEL===stateTask.task
+            ){
+
+                if(stateTask.droppedin.position==='front' || stateTask.droppedin.position==='fuel'){
+                    
+                    alert('La tarea que intenta realizar no esta permitida en este sector');
+                    return;
+                }
+                dispatchMessageTask({type:'FETCH_TASK_START', payload:{task:stateTask.task, isFinish:false}});
+
+                const data = {
+                    mechanicId:stateTask.mechanic.id,
+                    carId:stateCar.id,
+                    position:stateTask.droppedin.position,
+                    action:stateTask.task
+                }
+                apiClient.wheelAction(data)
                 .then(response=>{
-                    dispatchTask({type:'FETCH_TASK_END'});
-                    dispatchCar({type:'FETCH_FINISH',payload:response});
+                    console.log(response);
+                    if(response.code===6||
+                       response.code===10|| 
+                       response.code===12 ||
+                       response.code===13 || 
+                       response.code===14){
+                        //car not lifted
+                        dispatchTask({type:'FETCH_TASK_ERROR', payload:{code:response.code,message:response.message}});
+                        dispatchMessageTask({type:'FETCH_TASK_ERROR', payload:{code:response.code,message:response.message}});
+                        dispatchTask({type:'FETCH_TASK_END'});
+                    }else{
+                        dispatchCar({type:'FETCH_FINISH',payload:response});
+                        dispatchTask({type:'FETCH_TASK_END'});
+                        dispatchMessageTask({type:'FETCH_TASK_END', payload:{task:stateTask.task, isFinish:true}});
+                    }
+                }).catch(error=>{
+                    console.log(error);
                 })
             }
-        }
-        // if (LIFT_CAR === getMechanicAction) {
-        //     dispatchTask({type:'TASK_START',payload:getMechanicAction});
-        //     actionPromise = apiClient.liftCar(data);
-        // }
-
+            if(FILL_TANK===stateTask.task){
+            
+                    const data = {
+                        mechanicId:stateTask.mechanic.id,
+                        carId:stateCar.id,
+                    }
+                    apiClient.fillTank(data)
+                    .then(response=>{
+                        console.log(response);
+                        dispatchCar({type:'FETCH_FINISH',payload:response});
+                        dispatchTask({type:'FETCH_TASK_END'});
+                        dispatchMessageTask({type:'FETCH_TASK_END', payload:{task:stateTask.task, isFinish:true}});
+                    })
+                    .catch(error=>{
+                        console.log(error);
+                    })
+                }
+                if(CHECK===stateTask.task){
+                   
+                    const data = {
+                        carId:stateCar.id,
+                    }
+                    console.log(stateTask);
+                    apiClient.check(data)
+                    .then(response=>{
+                        dispatchTask({type:'FETCH_TASK_END'});
+                        dispatchMessageTask({type:'FETCH_TASK_END', payload:{task:stateTask.task, isFinish:true}});
+                    })
+                    .catch(error=>{
+                        console.log(error);
+                    })
+                }
+            return ()=>{
+                setSending(false);
+                dispatchTask({type:''});
+            }
     },[stateTask]);
-
-    // drag and drop validation and tracking positions
-    // useEffect(() => {
-    //     if (!getMechanicDropped) return;
-
-    //     const {
-    //         areaData: { position },
-    //         itemData,
-    //     } = getMechanicDropped;
-
-    //     if (!getCar.lifted && itemData.role !== JACKMAN) {
-    //         setError("This is not his/her role for lift the Car");
-    //         return 
-    //     }
-        
-    //     local auxiliar validations
-    //     if (getInternalPositionTeam[itemData.id].position) {
-    //         setError(itemData.name + " is already busy");
-    //         return
-    //     }
-
-    //     for (let [key, value] of Object.entries(getInternalPositionTeam)) {
-    //         if(value.position && value.position === position) {
-    //             setError(itemData.name + " can not do that job because another partner is working at " + position);
-    //             return
-    //         }
-    //     }
-
-    //     if (MECHANIC_PLACE_RULES[position].indexOf(itemData.role) === -1) {
-    //         setError(itemData.name + " it does not must be in that position");
-    //         return
-    //     }
-
-    //     track which mechanic is
-    //     const newMechanicPosition = { ...itemData, position }
-    //     setInternalPositionTeam({
-    //         ...getInternalPositionTeam,
-    //         [itemData.id]: newMechanicPosition,
-    //     });
-        
-    //     setSelectedMechanic(newMechanicPosition);
-    // }, [getMechanicDropped]);
-
-    // handle team actions
-    // useEffect(() => {
-    //     TODO:This validation prevent call same action again
-    //     if (!getMechanicAction) return;
-    //     const data = { mechanicId: selectedMechanic.id, carId: getCar.id };
-    //     const { position } = getInternalPositionTeam[selectedMechanic.id];
-
-    //     let actionPromise = null;
-
-    //     if (!getCar.lifted && LIFT_CAR !== getMechanicAction) {
-    //         setError("First, lift the Car");
-    //         return
-    //     }
-
-    //     start api actions
-
-
-        // if (LIFT_CAR === getMechanicAction) {
-        //     dispatchTask({type:'TASK_START',payload:getMechanicAction});
-        //     actionPromise = apiClient.liftCar(data);
-        // }
-
-    //     if (WHEEL_POSITIONS.indexOf(position) !== -1 && WHEEL_ACTIONS.indexOf(getMechanicAction) !== -1) {
-    //         dispatchTask({type:'TASK_START',payload:getMechanicAction});
-    //         actionPromise = apiClient.wheelAction({ ...data, position, action: getMechanicAction });
-    //     }
-
-    //     if (FILL_TANK === getMechanicAction) {
-    //         dispatchTask({type:'TASK_START',payload:getMechanicAction});
-    //         actionPromise = apiClient.fillTank(data);
-    //     }
-
-    //     if (!actionPromise) {
-    //         setLoading(false);
-    //         setError("No action enable for the sector");
-    //         return
-    //     }
-
-    //     actionPromise
-    //         .then((newCarState) => {
-    //             setCar(newCarState);
-    //             dispatch({type:'TASK_FINISH',payload:getMechanicAction});
-    //         })
-    //         .catch((err) => setError(err));
-    // }, [getMechanicAction]);
-  
 
     return (
         <div className="container">
@@ -321,17 +408,23 @@ const Boxes = (props) => {
                         selectedMechanic={stateMechanicSelected}
                         dispatchTask={dispatchTask}
                         task={stateTask}
+                        stateMessageTask={stateMessageTask}
+                        
                         />
                     )}
                 </div>
             </div>
             <div className="row">
-                <div className="col-9">
-                    {stateCar && <MechanicContainer team={team} />}
+                <div className="col-9 pr-0 pl-0">
+                    {stateCar && <MechanicContainer team={team} 
+                                    dispatchSelectedMechanic={dispatchSelectedMechanic}
+                                    stateMechanicSelected={stateMechanicSelected}
+                                    positionActive={positionActive}
+                    />}
                  </div>
             </div> 
         </div>
     );
 };
 
-export default Boxes;
+export default React.memo(Boxes);
