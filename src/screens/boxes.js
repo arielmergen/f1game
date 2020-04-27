@@ -3,7 +3,10 @@ import React, { useState, useEffect, useCallback, useReducer } from "react";
 import apiClient from "./../apiClient";
 //import { MECHANIC_PLACE_RULES, WHEEL_ACTIONS, WHEEL_POSITIONS, FILL_TANK, LIFT_CAR, JACKMAN } from "../constants";
 import {
-    MECHANIC,
+    MECHANIC_PLACE_RULES,
+    MECHANIC_PLACE_TASK,
+    MECHANIC_WHEEL_TASK_RULES,
+    WHEEL_TASK_RULES,
     JACKMAN,
     GAS_MAN,
     LIFT_CAR,
@@ -252,7 +255,6 @@ const Boxes = (props) => {
     const [positionActive, setPositionActive] = useState({});
     const [isLoadingPage, setisLoadingPage] = useState(false);
     const [checkStatus, setCheckStatus] = useState(false);
-    const [statusInternalCar, setStatusInternalCar] = useState({});
     const [statusCar, setStatusCar] = useState({});
     const { team } = getGameState;
 
@@ -279,11 +281,6 @@ const Boxes = (props) => {
         checkStatusCar(cardId);
     }, [checkStatus]);
 
-    /*Internal status*/
-    useEffect(() => {
-        console.log(statusInternalCar);
-    }, [statusInternalCar]);
-
     useEffect(() => {
         if (!stateCar.loading) {
             setisLoadingPage(true);
@@ -307,32 +304,89 @@ const Boxes = (props) => {
     /*MAnage TASKS*/
     useEffect(() => {
         if (!stateTask.isActive) return;
-        if (LIFT_CAR === stateTask.task) {
-            if ("front" !== stateTask.droppedin.position) {
-                dispatchMessageTask({
-                    type: "FETCH_TASK_ERROR",
-                    payload: {
-                        code: 1024,
-                        message:
-                            "Um..,Boss.., Can only lift the car from the front",
-                    },
-                });
-                return;
-            }
+        /*Verify if Car was Lifted to make Wheels tasks*/
+        if (
+            !stateCar.lifted &&
+            FILL_TANK !== stateTask.task &&
+            LIFT_CAR !== stateTask.task
+        ) {
+            dispatchMessageTask({
+                type: "FETCH_TASK_ERROR",
+                payload: {
+                    code: 12,
+                    message:
+                        "Um..., Boss..., You do need to Lift the car for this action...",
+                },
+            });
+            return;
+        }
+        /*Valid task by role in position */
+        if (
+            MECHANIC_PLACE_RULES[stateTask.droppedin.position].indexOf(
+                stateTask.mechanic.role
+            ) === -1
+        ) {
+            dispatchMessageTask({
+                type: "FETCH_TASK_ERROR",
+                payload: {
+                    code: 1024,
+                    message: `Sorry, Boss..., but isn't position for a ${stateTask.mechanic.role}, please try another position.`,
+                },
+            });
+            return;
+        }
 
-            if (
-                Object.keys(statusInternalCar).length !== 0 &&
-                statusInternalCar.lifted
-            ) {
-                dispatchMessageTask({
-                    type: "FETCH_TASK_ERROR",
-                    payload: {
-                        code: 1024,
-                        message: "Um..., Boss...The car is Lifted",
-                    },
-                });
-                return;
-            }
+        /*Valid task in poistion */
+
+        if (
+            MECHANIC_PLACE_TASK[stateTask.droppedin.position].indexOf(
+                stateTask.task
+            ) === -1
+        ) {
+            dispatchMessageTask({
+                type: "FETCH_TASK_ERROR",
+                payload: {
+                    code: 1024,
+                    message: `Sorry, Boss..., but this not position for ${stateTask.task} a Car, please try another position.`,
+                },
+            });
+            return;
+        }
+
+        if (FILL_TANK === stateTask.task) {
+            const data = {
+                carId: stateCar.id,
+                mechanicId: stateTask.mechanic.id,
+            };
+            apiClient
+                .fillTank(data)
+                .then((response) => {
+                    if (response.code) {
+                        dispatchMessageTask({
+                            type: "FETCH_TASK_ERROR",
+                            payload: {
+                                code: response.code,
+                                message: response.message,
+                            },
+                        });
+                    } else {
+                        dispatchCar({
+                            type: "FETCH_FINISH",
+                            payload: response,
+                        });
+                        dispatchTask({ type: "FINISH_TASK" });
+                        dispatchMessageTask({
+                            type: "FETCH_TASK_END",
+                            payload: { task: FILL_TANK, isFinish: true },
+                        });
+
+                        setCheckStatus(true);
+                    }
+                })
+                .catch((err) => console.log(err));
+        }
+
+        if (LIFT_CAR === stateTask.task) {
             dispatchMessageTask({
                 type: "FETCH_TASK_START",
                 payload: { task: LIFT_CAR, isFinish: false },
@@ -357,10 +411,6 @@ const Boxes = (props) => {
                             type: "FETCH_FINISH",
                             payload: response,
                         });
-                        setStatusInternalCar({
-                            ...statusInternalCar,
-                            lifted: response.lifted,
-                        });
                         dispatchTask({ type: "FINISH_TASK" });
                         dispatchMessageTask({
                             type: "FETCH_TASK_END",
@@ -373,278 +423,100 @@ const Boxes = (props) => {
                 .catch((error) => {
                     console.log(error);
                 });
+            return;
         }
-        if (
-            CHANGE_WHEEL === stateTask.task ||
-            UNFASTEN_WHEEL === stateTask.task ||
-            FASTEN_WHEEL === stateTask.task
-        ) {
-            if (
-                stateTask.droppedin.position === "front" ||
-                stateTask.droppedin.position === "fuel"
-            ) {
-                dispatchMessageTask({
-                    type: "FETCH_TASK_ERROR",
-                    payload: {
-                        code: 14,
-                        message: "Um..., Boss...That isn´t the wheel.",
-                    },
-                });
-                return;
-            }
 
-            if (
-                stateTask.mechanic.role === JACKMAN &&
-                !statusInternalCar.hasOwnProperty("wheel")
-            ) {
-                dispatchMessageTask({
-                    type: "FETCH_TASK_ERROR",
-                    payload: {
-                        code: 1024,
-                        message:
-                            "Um..., Boss... Before do you need Unfasten the wheel.",
-                    },
-                });
-                return;
-            }
-
-            if (Object.keys(statusInternalCar).length === 0) {
-                dispatchMessageTask({
-                    type: "FETCH_TASK_ERROR",
-                    payload: {
-                        code: 12,
-                        message:
-                            "You do need to Lift the car for this action...",
-                    },
-                });
-                return;
-            }
-
-            if (
-                stateTask.task === FASTEN_WHEEL &&
-                !statusInternalCar.hasOwnProperty("wheel")
-            ) {
-                dispatchMessageTask({
-                    type: "FETCH_TASK_ERROR",
-                    payload: {
-                        code: 14,
-                        message:
-                            "To this action you do need unfasten the wheel first action (Press de button Unfasten)",
-                    },
-                });
-                return;
-            }
-
-            if (statusInternalCar.hasOwnProperty("wheel")) {
+        /*WHEEL CAR ACTIONS*/
+        stateCar.wheels.find((wheel) => {
+            if (wheel.position === stateTask.droppedin.position) {
+                /*Check if Jackman try change the wheel if  it not loosen before.*/
                 if (
-                    stateTask.task === UNFASTEN_WHEEL &&
-                    statusInternalCar.wheel[stateTask.droppedin.position] ===
-                        "LOOSE"
+                    stateTask.mechanic.role === JACKMAN &&
+                    MECHANIC_WHEEL_TASK_RULES[stateTask.mechanic.role].indexOf(
+                        wheel.status
+                    )
                 ) {
                     dispatchMessageTask({
                         type: "FETCH_TASK_ERROR",
                         payload: {
-                            code: 14,
-                            message: "Um..., Boss...The wheel is Unfasten",
-                        },
-                    });
-                    return;
-                }
-
-                if (
-                    stateTask.task === CHANGE_WHEEL &&
-                    statusInternalCar.wheel[stateTask.droppedin.position] ===
-                        "CHANGED"
-                ) {
-                    dispatchMessageTask({
-                        type: "FETCH_TASK_ERROR",
-                        payload: {
-                            code: 14,
+                            code: 12,
                             message:
-                                "Um..., Boss...The wheel has already Changed",
+                                "Sorry Boss..., A mechanic must loosen the wheel to change it",
                         },
                     });
                     return;
-                }
+                } else {
+                    if (WHEEL_TASK_RULES[stateTask.task] === wheel.status) {
+                        const data = {
+                            mechanicId: stateTask.mechanic.id,
+                            carId: stateCar.id,
+                            position: stateTask.droppedin.position,
+                            action: stateTask.task,
+                        };
 
-                if (
-                    stateTask.task === FASTEN_WHEEL &&
-                    statusInternalCar.wheel[stateTask.droppedin.position] ===
-                        "READY"
-                ) {
-                    dispatchMessageTask({
-                        type: "FETCH_TASK_ERROR",
-                        payload: {
-                            code: 14,
-                            message:
-                                "Um..., Boss...The wheel already was changed and Fasten...",
-                        },
-                    });
-                    return;
-                }
-
-                if (
-                    stateTask.task === CHANGE_WHEEL &&
-                    statusInternalCar.wheel[stateTask.droppedin.position] !==
-                        "LOOSE"
-                ) {
-                    dispatchMessageTask({
-                        type: "FETCH_TASK_ERROR",
-                        payload: {
-                            code: 14,
-                            message:
-                                "Um..., Boss...to this action you do need unfasten the wheel first action (Press de button Unfasten)",
-                        },
-                    });
-                    return;
-                }
-                if (
-                    stateTask.task === FASTEN_WHEEL &&
-                    statusInternalCar.wheel[stateTask.droppedin.position] !==
-                        "CHANGE"
-                ) {
-                    dispatchMessageTask({
-                        type: "FETCH_TASK_ERROR",
-                        payload: {
-                            code: 14,
-                            message:
-                                "Um..., Boss...to this action you do need change the wheel first (Press de button Change)",
-                        },
-                    });
-                    return;
-                }
-            }
-            dispatchMessageTask({
-                type: "FETCH_TASK_ERROR",
-                payload: {
-                    code: 12,
-                    message: "You do need to Lift the car for this action...",
-                },
-            });
-
-            dispatchMessageTask({
-                type: "FETCH_TASK_START",
-                payload: { task: stateTask.task, isFinish: false },
-            });
-
-            const data = {
-                mechanicId: stateTask.mechanic.id,
-                carId: stateCar.id,
-                position: stateTask.droppedin.position,
-                action: stateTask.task,
-            };
-
-            apiClient
-                .wheelAction(data)
-                .then((response) => {
-                    console.log(response);
-                    if (
-                        response.code === 6 ||
-                        response.code === 10 ||
-                        response.code === 12 ||
-                        response.code === 13 ||
-                        response.code === 14
-                    ) {
-                        //car not lifted
-                        dispatchTask({
-                            type: "FETCH_TASK_ERROR",
-                            payload: {
-                                code: response.code,
-                                message: response.message,
-                            },
-                        });
-                        dispatchMessageTask({
-                            type: "FETCH_TASK_ERROR",
-                            payload: {
-                                code: response.code,
-                                message: response.message,
-                            },
-                        });
-                        dispatchTask({ type: "FETCH_TASK_END" });
-
-                        //setStatusInternalCar({...statusInternalCar, lifted: response.lifted});
+                        apiClient
+                            .wheelAction(data)
+                            .then((response) => {
+                                console.log(response);
+                                if (
+                                    response.code === 6 ||
+                                    response.code === 10 ||
+                                    response.code === 12 ||
+                                    response.code === 13 ||
+                                    response.code === 14
+                                ) {
+                                    //car not lifted
+                                    dispatchTask({
+                                        type: "FETCH_TASK_ERROR",
+                                        payload: {
+                                            code: response.code,
+                                            message: response.message,
+                                        },
+                                    });
+                                    dispatchMessageTask({
+                                        type: "FETCH_TASK_ERROR",
+                                        payload: {
+                                            code: response.code,
+                                            message: response.message,
+                                        },
+                                    });
+                                    dispatchTask({ type: "FETCH_TASK_END" });
+                                } else {
+                                    dispatchCar({
+                                        type: "FETCH_FINISH",
+                                        payload: response,
+                                    });
+                                    dispatchTask({ type: "FETCH_TASK_END" });
+                                    dispatchMessageTask({
+                                        type: "FETCH_TASK_END",
+                                        payload: {
+                                            task: stateTask.task,
+                                            isFinish: true,
+                                        },
+                                    });
+                                }
+                            })
+                            .catch((error) => {
+                                console.log(error);
+                            });
+                        return;
                     } else {
-                        dispatchCar({
-                            type: "FETCH_FINISH",
-                            payload: response,
-                        });
-                        dispatchTask({ type: "FETCH_TASK_END" });
                         dispatchMessageTask({
-                            type: "FETCH_TASK_END",
-                            payload: { task: stateTask.task, isFinish: true },
+                            type: "FETCH_TASK_ERROR",
+                            payload: {
+                                code: 12,
+                                message: `Sorry  Boss..., the wheel must be ${
+                                    WHEEL_TASK_RULES[stateTask.task]
+                                }`,
+                            },
                         });
-                        response.wheels.filter((wheel) => {
-                            if (
-                                wheel.position === stateTask.droppedin.position
-                            ) {
-                                setStatusInternalCar({
-                                    ...statusInternalCar,
-                                    wheel: {
-                                        [stateTask.droppedin.position]:
-                                            wheel.status,
-                                    },
-                                });
-                            }
-                        });
+                        return;
                     }
-                })
-                .catch((error) => {
-                    console.log(error);
-                });
-        }
-        if (FILL_TANK === stateTask.task) {
-            console.log(stateTask);
-            if (stateTask.droppedin.position !== "fuel") {
-                dispatchMessageTask({
-                    type: "FETCH_TASK_ERROR",
-                    payload: {
-                        code: 1024,
-                        message:
-                            "You can only load gasoline from the Fuel position",
-                    },
-                });
-                return;
+                }
             }
-            const data = {
-                mechanicId: stateTask.mechanic.id,
-                carId: stateCar.id,
-            };
-            apiClient
-                .fillTank(data)
-                .then((response) => {
-                    console.log(response);
-                    dispatchCar({ type: "FETCH_FINISH", payload: response });
-                    dispatchTask({ type: "FETCH_TASK_END" });
-                    dispatchMessageTask({
-                        type: "FETCH_TASK_END",
-                        payload: { task: stateTask.task, isFinish: true },
-                    });
-                })
-                .catch((error) => {
-                    console.log(error);
-                });
-        }
-        if (CHECK === stateTask.task) {
-            const data = {
-                carId: stateCar.id,
-            };
-            console.log(stateTask);
-            apiClient
-                .check(data)
-                .then((response) => {
-                    dispatchTask({ type: "FETCH_TASK_END" });
-                    dispatchMessageTask({
-                        type: "FETCH_TASK_END",
-                        payload: { task: stateTask.task, isFinish: true },
-                    });
-                })
-                .catch((error) => {
-                    console.log(error);
-                });
-        }
-        return () => {
-            dispatchTask({ type: "" });
-        };
+        });
+
+        return;
     }, [stateTask]);
 
     return (
