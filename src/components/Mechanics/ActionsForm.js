@@ -27,11 +27,12 @@ const LABELS = {
 const executeTask = (ev, task, selectedMechanic, dispatchTask) => {
     ev.preventDefault();
     const data = {
-        mechanic: selectedMechanic,
-        isActive: true,
+        mechanic: selectedMechanic.mechanic,
+        car: selectedMechanic.car,
+        droppedin: selectedMechanic.position,
     };
 
-    dispatchTask({ type: `${task}`, payload: { data } });
+    dispatchTask({ type: `${task}`, payload: data });
 };
 
 const Actions = ({ actions, dispatchTask, selectedMechanic }) => {
@@ -54,23 +55,23 @@ const Actions = ({ actions, dispatchTask, selectedMechanic }) => {
     );
 };
 
-const ActionsForm = ({ role, dispatchTask, selectedMechanic }) => (
+const ActionsForm = ({ dispatchTask, selectedMechanic }) => (
     <>
-        {role === MECHANIC && (
+        {selectedMechanic.mechanic.role === MECHANIC && (
             <Actions
                 selectedMechanic={selectedMechanic}
                 actions={MECHANIC_ACTIONS}
                 dispatchTask={dispatchTask}
             />
         )}
-        {role === JACKMAN && (
+        {selectedMechanic.mechanic.role === JACKMAN && (
             <Actions
                 selectedMechanic={selectedMechanic}
                 actions={JACKMAN_ACTIONS}
                 dispatchTask={dispatchTask}
             />
         )}
-        {role === GAS_MAN && (
+        {selectedMechanic.mechanic.role === GAS_MAN && (
             <Actions
                 selectedMechanic={selectedMechanic}
                 actions={GAS_MAN_ACTIONS}

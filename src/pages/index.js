@@ -24,6 +24,10 @@ const Index = (props) => {
         () => setCurrentPage({ page: "Intro" }),
         []
     );
+    const goToScorePage = useCallback(
+        () => setCurrentPage({ page: "Score" }),
+        []
+    );
     const goToBoxesPage = useCallback(
         (name) => {
             apiClient
@@ -38,10 +42,6 @@ const Index = (props) => {
                 });
         },
         [getGameState, goToErrorPage]
-    );
-    const goToScorePage = useCallback(
-        () => setCurrentPage({ page: "Score" }),
-        []
     );
     const returnToIndex = useCallback(() => {
         setGameState(inital_game_state);
@@ -58,13 +58,16 @@ const Index = (props) => {
             {getCurrentpage.page === "Boxes" && (
                 <Boxes
                     getGameState={getGameState}
+                    setGameState={setGameState}
                     goToScorePage={goToScorePage}
+                    setCurrentPage={setCurrentPage}
                 />
             )}
             {getCurrentpage.page === "Score" && (
                 <Score
                     getGameState={getGameState}
                     setGameState={setGameState}
+                    setCurrentPage={setCurrentPage}
                 />
             )}
             {getCurrentpage.page === "Error" && getGameState.error && (

@@ -8,7 +8,6 @@ const Intro = ({ startGame }) => {
 
     const goToRulesScreen = () => setUserScreen({ screen: "Rules" });
     const goToUserFormScreen = () => setUserScreen({ screen: "UserForm" });
-
     return (
         <div className={`container`}>
             {getUserScreen.screen === "UserForm" && (

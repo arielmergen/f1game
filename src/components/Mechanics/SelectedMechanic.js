@@ -3,22 +3,7 @@ import React, { useState, useReducer, useEffect, useCallback } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-import {
-    LIFT_CAR,
-    UNFASTEN_WHEEL,
-    CHANGE_WHEEL,
-    FASTEN_WHEEL,
-    FILL_TANK,
-} from "../../constants";
-
 import ActionsForm from "./ActionsForm";
-
-const PROCESSING = "Processing..";
-const UNFASTEN_WHEEL_MESSAGE = "Wheel is UnFasten";
-const FASTEN_WHEEL_MESSAGE = "Wheel is Fasten";
-const CHANGE_WHEEL_MESSAGE = "The wheel has been changed...";
-const FILL_TANK_MESSAGE = "Full tank";
-const LIFT_CAR_LIFT_MESSAGE = "Ready...,The car is lifted";
 
 toast.configure();
 
@@ -44,89 +29,53 @@ const Msg = (props) => {
 };
 
 const SelectedMechanic = (props) => {
-    const { selectedMechanic, dispatchTask, stateMessageTask } = props;
+    const {
+        selectedMechanic,
+        dispatchTask,
+        stateMessageTask,
+        checkStatus,
+    } = props;
     const { id, name, role, image, droppedin } = selectedMechanic;
 
-    const [mechanicWasSelected, setmechanicWasSelected] = useState(false);
-
-    let toastId = null;
-
     useEffect(() => {
-        if (selectedMechanic && selectedMechanic.selected) {
-            setmechanicWasSelected(true);
-        }
-        return () => {
-            setmechanicWasSelected(true);
-        };
-    }, [selectedMechanic, selectedMechanic.selected]);
-
-    useEffect(() => {
-        if (
-            stateMessageTask.code === 1024 ||
-            stateMessageTask.code === 6 ||
-            stateMessageTask.code === 12 ||
-            stateMessageTask.code === 13 ||
-            stateMessageTask.code === 14 ||
-            stateMessageTask.code === 18
-        ) {
-            // toast.error(stateMessageTask.message, {
-            //     position: toast.POSITION.TOP_RIGHT,
-            // });
-            toast(<Msg message={stateMessageTask.message} image={image} />, {
-                position: toast.POSITION.TOP_RIGHT,
-            });
+        let toastId = null;
+        if (stateMessageTask.code !== 0 && selectedMechanic.selected) {
+            toast(
+                <Msg
+                    message={stateMessageTask.message}
+                    image={selectedMechanic.mechanic.image}
+                />,
+                {
+                    position: toast.POSITION.TOP_RIGHT,
+                }
+            );
             return;
         }
 
-        if (stateMessageTask.task && !stateMessageTask.isFinish) {
-            toastId = toast.info(PROCESSING, {
-                position: toast.POSITION.TOP_RIGHT,
-            });
-        }
-        if (stateMessageTask.task === LIFT_CAR && stateMessageTask.isFinish) {
-            toast(<Msg message={LIFT_CAR_LIFT_MESSAGE} image={image} />, {
-                position: toast.POSITION.TOP_RIGHT,
-                autoclose: 1000,
-            });
-        }
-
         if (
-            stateMessageTask.isFinish &&
-            stateMessageTask.task === UNFASTEN_WHEEL
+            stateMessageTask.task !== "" &&
+            stateMessageTask.message !== "" &&
+            selectedMechanic.selected
         ) {
-            toast(<Msg message={UNFASTEN_WHEEL_MESSAGE} image={image} />, {
-                position: toast.POSITION.TOP_RIGHT,
-            });
-        }
-        if (
-            stateMessageTask.isFinish &&
-            stateMessageTask.task === FASTEN_WHEEL
-        ) {
-            toast(<Msg message={FASTEN_WHEEL_MESSAGE} image={image} />, {
-                position: toast.POSITION.TOP_RIGHT,
-            });
-        }
-        if (
-            stateMessageTask.isFinish &&
-            stateMessageTask.task === CHANGE_WHEEL
-        ) {
-            toast.success(CHANGE_WHEEL_MESSAGE, {
-                position: toast.POSITION.TOP_RIGHT,
-            });
-        }
-        if (stateMessageTask.isFinish && stateMessageTask.task === FILL_TANK) {
-            toast.success(FILL_TANK_MESSAGE, {
-                position: toast.POSITION.TOP_RIGHT,
-            });
+            toast(
+                <Msg
+                    message={stateMessageTask.message}
+                    image={selectedMechanic.mechanic.image}
+                />,
+                {
+                    position: toast.POSITION.TOP_RIGHT,
+                }
+            );
         }
     }, [stateMessageTask]);
 
     return (
         <>
-            {mechanicWasSelected && (
+            {selectedMechanic.selected && (
                 <div className="card border-danger text-white bg-danger">
                     <h5 className="card-header text-center text-white bg-danger">
-                        {name} - {role}
+                        {selectedMechanic.mechanic.name} -{" "}
+                        {selectedMechanic.mechanic.role}
                     </h5>
                     <div className="card-body">
                         <ActionsForm
@@ -134,14 +83,14 @@ const SelectedMechanic = (props) => {
                             dispatchTask={dispatchTask}
                             selectedMechanic={selectedMechanic}
                         />
-                        {droppedin.position && (
+                        {/* {droppedin.position && (
                             <p>
                                 Position:{" "}
                                 {droppedin.position
                                     ? droppedin.position
                                     : "none"}
                             </p>
-                        )}
+                        )} */}
                     </div>
                 </div>
             )}

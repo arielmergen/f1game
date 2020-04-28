@@ -20,7 +20,7 @@ const DragArea = (props) => {
         ev.dataTransfer.getData("text");
         dispatchSelectedMechanic({
             type: "MECHANIC_SELECTED",
-            payload: { mechanic: itemDropped, droppedin: areaData },
+            payload: { ...areaData, mechanic: itemDropped },
         });
         ev.dataTransfer.clearData();
     };

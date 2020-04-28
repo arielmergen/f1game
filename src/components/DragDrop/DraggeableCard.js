@@ -19,28 +19,6 @@ const DraggeableCard = (props) => {
         // console.log(member);
         ev.dataTransfer.getData("text/uri-list");
     };
-    const selectedByClick = (ev) => {
-        ev.preventDefault();
-        if (Object.keys(positionActive) !== 0) {
-            const memediId = positionActive.hasOwnProperty(member.id);
-            if (memediId) {
-                let itemDropped = {
-                    id: member.id,
-                    name: member.name,
-                    role: member.role,
-                    selected: member.selected,
-                    image: member.image,
-                };
-                dispatchSelectedMechanic({
-                    type: "MECHANIC_SELECTED",
-                    payload: {
-                        mechanic: itemDropped,
-                        droppedin: positionActive[member.id].droppedin,
-                    },
-                });
-            }
-        }
-    };
 
     return (
         <div
@@ -49,7 +27,6 @@ const DraggeableCard = (props) => {
             draggable
             onDragStart={startDrag}
             onDragOver={ondragOver}
-            onClick={selectedByClick}
         >
             {props.children}
         </div>

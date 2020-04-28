@@ -41,19 +41,27 @@
 }
 
 
-.need-change{
+.NEEDS_CHANGE{
     border: 4px dotted rgb(255, 0, 0);
 }
+.LOOSE{
+    border: 4px dotted rgb(255, 251, 0);
+}
+.CHANGED{
+    border: 4px dotted rgb(255, 166, 0);
+}
+.REMOVED{
+    border: 4px dotted rgb(255, 166, 0);
+}
 
-.loose{
+.READY{
     /* background-color:rgb(255, 0, 0); */
     border: 4px dotted rgb(102, 255, 0);
 }
 
-.ready{
+.REMOVED{
     border: 4px dotted rgb(0, 225, 255);
 }
-
 .grid-top {
     display: grid;
     grid-template-columns: repeat(12, 3fr);

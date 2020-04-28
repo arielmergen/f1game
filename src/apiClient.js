@@ -71,7 +71,7 @@ const wheelAction = ({ mechanicId, carId, position, action }) =>
         },
     }).then((data) => data.json());
 
-const check = (carId) =>
+const check = ({ carId }) =>
     fetch(API_URI + `cars/${carId}/check`, {
         crossDomain: true,
         method: "POST",

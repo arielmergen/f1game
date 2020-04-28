@@ -5,10 +5,22 @@ import { FRONT, FUEL } from "../constants";
 import DropArea from "../components/DragDrop/DropArea";
 import "./../css/grid.css";
 
+import {
+    NEEDS_CHANGE,
+    LOOSE,
+    REMOVED,
+    PLACED,
+    CHANGED,
+    READY,
+} from "./../constants";
+
 const STATUS_WHEEL_STYLE = {
-    NEEDS_CHANGE: "need-change",
-    LOOSE: "loose",
-    READY: "ready",
+    NEEDS_CHANGE,
+    LOOSE,
+    READY,
+    REMOVED,
+    PLACED,
+    CHANGED,
 };
 
 const Car = (props) => {
@@ -21,13 +33,26 @@ const Car = (props) => {
                 <div className={`car grid ${car.lifted ? "car-lifted" : ""} `}>
                     <DropArea
                         dispatchSelectedMechanic={dispatchSelectedMechanic}
-                        areaData={{ position: FRONT }}
-                        className="front"
+                        areaData={{
+                            car: { carId: car.id, lifted: car.lifted },
+                            position: FRONT,
+                        }}
+                        className={`front ${car.lifted ? "READY" : ""} `}
                     />
                     {car.wheels.map(({ position, status }) => (
                         <DropArea
                             key={position}
-                            areaData={{ position }}
+                            areaData={{
+                                car: {
+                                    carId: car.id,
+                                    lifted: car.lifted,
+                                    wheel: {
+                                        position: position,
+                                        status: status,
+                                    },
+                                },
+                                position: position,
+                            }}
                             statusWheel={status}
                             // setDropedData={setMechanicDropped}
                             dispatchSelectedMechanic={dispatchSelectedMechanic}
@@ -37,10 +62,13 @@ const Car = (props) => {
                         />
                     ))}
                     <DropArea
-                        areaData={{ position: FUEL }}
+                        areaData={{
+                            car: { carId: car.id, fuel: car.fuel },
+                            position: FUEL,
+                        }}
                         // setDropedData={setMechanicDropped}
                         dispatchSelectedMechanic={dispatchSelectedMechanic}
-                        className="fuel"
+                        className={`fuel ${car.fuel === 100 ? "READY" : ""} `}
                     />
                 </div>
             )}
