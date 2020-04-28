@@ -36,6 +36,8 @@ import {
     reducerDipatchApi,
 } from "./../reducers";
 
+import { toast } from "react-toastify";
+
 import Car from "./../layout/Car";
 
 import MechanicContainer from "../components/Mechanics/MechanicContainer";
@@ -60,8 +62,11 @@ const Boxes = (props) => {
     );
     const [isLoadingPage, setisLoadingPage] = useState(false);
     const [score, setScore] = useState(100);
+    const [activeCheck, setActiveCheck] = useState(false);
 
     const { team } = getGameState;
+
+    toast.configure();
 
     useEffect(() => {
         dispatchCar({ type: "FETCH_START" });
@@ -82,6 +87,8 @@ const Boxes = (props) => {
             setCurrentPage({ page: "Score" });
         }
     }, [score]);
+
+    useEffect(() => {}, []);
 
     useEffect(() => {
         if (Object.keys(stateApi.data).length === 0) return;
@@ -208,7 +215,6 @@ const Boxes = (props) => {
             });
 
             apiClient.check(stateApi.data).then((response) => {
-                console.log(response);
                 if (response.code) {
                     dispatchMessageTask({
                         type: "SEND_MESSAGE",
@@ -227,13 +233,10 @@ const Boxes = (props) => {
                         setGameState({ ...getGameState, score });
                         setCurrentPage({ page: "Score" });
                     } else {
-                        dispatchMessageTask({
-                            type: "SEND_MESSAGE",
-                            payload: {
-                                task: CHECK,
-                                message: "THE CAR IS NOT READY",
-                            },
+                        toast.info("THE CAR IS NOT READY", {
+                            position: toast.POSITION.BOTTOM_CENTER,
                         });
+
                         dispatchSelectedMechanic({
                             type: "MECHANIC_UNSELECTED",
                         });
@@ -343,6 +346,13 @@ const Boxes = (props) => {
         dispatchApi({ type: task.task, payload: { data } });
     };
 
+    const clickCheckTask = () => {
+        const data = {
+            carId: stateCar.id,
+        };
+        dispatchApi({ type: CHECK, payload: { data } });
+    };
+
     const verifyLiftedAndPosistionWheel = (task, stateCar) => {
         let isChange = false;
 
@@ -406,7 +416,6 @@ const Boxes = (props) => {
         if (CHECK === stateTask.task) {
             checkTask(stateTask);
         }
-        return;
     }, [stateTask]);
 
     return (
@@ -445,6 +454,21 @@ const Boxes = (props) => {
                             </div>
                         </div>
                     </section>
+                </div>
+                <div className="col-12">
+                    <div className="control-group">
+                        <div className="form-group floating-label-form-group controls mb-0 pb-2">
+                            <div className="form-group mt-4">
+                                <button
+                                    className="btn btn-danger btn-xl btn-block"
+                                    id="sendMessageButton"
+                                    onClick={clickCheckTask}
+                                >
+                                    Check Status!
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div className="col-9 mb-2">
                     {isLoadingPage && (
